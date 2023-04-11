@@ -1,6 +1,6 @@
 # Project-specific settings
 PROJECT := evo_comp_ecology
-EMP_DIR := ../Empirical/include/emp
+EMP_DIR := third-party/Empirical/include/emp
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/
