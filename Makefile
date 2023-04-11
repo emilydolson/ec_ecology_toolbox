@@ -36,7 +36,7 @@ benchmark: tests/test_interaction_networks.cc
 	./test benchmarks
 
 wrapper:
-	$(CXX_nat) -shared $(shell python3 -m pybind11 --includes)/ -I/usr/include/python3.8/ $(CFLAGS_all) source/wrapper.cc -o lexicase$(shell python3-config --extension-suffix)
+	$(CXX_nat) -shared $(shell python3 -m pybind11 --includes)/ $(CFLAGS_all) source/wrapper.cc -o lexicase$(shell python3-config --extension-suffix)
 
 clean:
 	rm -f *~ source/*.o test *.gcda *.gcno
