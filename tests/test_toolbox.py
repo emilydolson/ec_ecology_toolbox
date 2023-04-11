@@ -1,5 +1,5 @@
-import eco_ec_toolbox
+import ec_ecology_toolbox as eco
 
 
 def test_lex_prob():
-    eco_ec_toolbox.LexicaseFitness([[1, 2, 3]], 1)
+    eco.LexicaseFitness([[1, 2, 3]], 1)
