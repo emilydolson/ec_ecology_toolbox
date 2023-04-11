@@ -1,7 +1,5 @@
-import sys
 
 # Available at setup time due to pyproject.toml
-from pybind11 import get_cmake_dir
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import setup
 
@@ -17,23 +15,21 @@ __version__ = "0.0.1"
 #   reproducible builds (https://github.com/pybind/python_example/pull/53)
 
 ext_modules = [
-    Pybind11Extension("lexicase",
-        ["source/wrapper.cc"],
-        # Example: passing in the version to the compiled code
-        define_macros = [('VERSION_INFO', __version__)],
-        include_dirs = ['../Empirical/include/emp'],
-        cxx_std=20
-        ),
+    Pybind11Extension("eco_ec_toolbox",
+                      ["source/wrapper.cc"],
+                      include_dirs=['third-party/Empirical/include/emp'],
+                      cxx_std=20
+                      ),
 ]
 
 setup(
-    name="python_example",
+    name="eco_ec_toolbox",
     version=__version__,
-    author="Sylvain Corlay",
-    author_email="sylvain.corlay@gmail.com",
-    url="https://github.com/pybind/python_example",
-    description="A test project using pybind11",
-    long_description="",
+    author="Emily Dolson",
+    author_email="emilyldolson@gmail.com",
+    url="https://github.com/emilydolson/ec_ecology_toolbox",
+    description="Tools to analyze the ecology of evolutionary algorithms",
+    long_description="A library of tools to analyze the ecology of evolutionary algorithms",
     ext_modules=ext_modules,
     extras_require={"test": "pytest"},
     # Currently, build_ext only provides an optional "highest supported C++
