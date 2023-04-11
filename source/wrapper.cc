@@ -5,7 +5,7 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
-PYBIND11_MODULE(lexicase, m) {
+PYBIND11_MODULE(ec_ecology_toolbox, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
     //m.def("LexicaseFitness", &LexicaseFitness<emp::vector<double>>, "The lexicase function");

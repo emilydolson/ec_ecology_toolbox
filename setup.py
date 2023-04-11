@@ -15,7 +15,7 @@ __version__ = "0.0.1"
 #   reproducible builds (https://github.com/pybind/python_example/pull/53)
 
 ext_modules = [
-    Pybind11Extension("eco_ec_toolbox",
+    Pybind11Extension("ec_ecology_toolbox",
                       ["source/wrapper.cc"],
                       include_dirs=['third-party/Empirical/include/emp'],
                       cxx_std=20
@@ -23,7 +23,7 @@ ext_modules = [
 ]
 
 setup(
-    name="eco_ec_toolbox",
+    name="ec_ecology_toolbox",
     version=__version__,
     author="Emily Dolson",
     author_email="emilyldolson@gmail.com",
@@ -36,6 +36,5 @@ setup(
     # level" feature, but in the future it may provide more features.
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    python_requires=">=3.7",
-    packages=["eco_ec_toolbox"],
+    python_requires=">=3.7"
 )
