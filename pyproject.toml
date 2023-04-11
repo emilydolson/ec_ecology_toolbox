@@ -9,5 +9,5 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 test-command = "python {project}/tests/test_toolbox.py"
-skip = ["*musllinux*", "cp36-win*", "cp37-win*", "cp38-win*"]
+skip = ["*musllinux*", "cp*-win*"]
 test-requires = "pytest"
