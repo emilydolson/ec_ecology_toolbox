@@ -464,38 +464,38 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
 
 TEST_CASE("Tournament", "[selection_schemes]") {
     emp::vector<org_t> pop = emp::vector<org_t>({{3,3,3}, {3, 3, 3}, {3,3,3}});
-    emp::vector<double> fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(2), DEFAULT));
+    emp::vector<double> fits = TournamentFitness(pop,  2);
     CHECK(fits[0] == Approx(.3333333));    
 
-    fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(3), DEFAULT));
+    fits = TournamentFitness(pop, 3);
     CHECK(fits[1] == Approx(.3333333));
 
-    fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(1), DEFAULT));
+    fits = TournamentFitness(pop, 1);
     CHECK(fits[2] == Approx(.3333333));
 
 
     pop = emp::vector<org_t>({{0,3,0}, {0, 3, 3}, {3,3,0}});
-    fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(3), DEFAULT));
+    fits = TournamentFitness(pop,  3);
     CHECK(fits[1] == Approx(13.0/27.0));    
     CHECK(fits[2] == Approx(13.0/27.0));    
     CHECK(fits[0] == Approx(1.0/27.0));    
 
     pop = emp::vector<org_t>({{0,3,0}, {0, 3, 3}, {3,3,3}});
-    fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(3), DEFAULT));
+    fits = TournamentFitness(pop,  3);
     CHECK(fits[1] == Approx(7.0/27.0));    
     CHECK(fits[2] == Approx(19.0/27.0));    
     CHECK(fits[0] == Approx(1.0/27.0));    
 
     pop = emp::vector<org_t>({{0,3,3}, {3, 3, 3}, {3,3,3}});
-    fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(3), DEFAULT));
+    fits = TournamentFitness(pop,  3);
     CHECK(fits[1] == Approx(13.0/27.0));    
     CHECK(fits[0] == Approx(1.0/27.0));    
 
-    fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(2), DEFAULT));
+    fits = TournamentFitness(pop,  2);
     CHECK(fits[2] == Approx(.44444));    
     CHECK(fits[0] == Approx(.11111));    
 
-    fits = TournamentFitness(pop,  emp::tools::Merge(TournamentSize(1), DEFAULT));
+    fits = TournamentFitness(pop,  1);
     CHECK(fits[2] == Approx(.3333333));    
     CHECK(fits[0] == Approx(.3333333));    
 
@@ -503,18 +503,17 @@ TEST_CASE("Tournament", "[selection_schemes]") {
 
 TEST_CASE("Fitness sharing", "[selection_schemes]") {
     emp::vector<org_t> pop = emp::vector<org_t>({{3,3,3}, {3, 3, 3}, {3,3,3}});
-    all_attrs settings = DEFAULT;
-    fit_map_t fits = SharingFitness(pop, settings);
+    fit_map_t fits = SharingFitness(pop, 2, 1, 8);
     CHECK(fits[0] == Approx(.3333333));
 
     pop = emp::vector<org_t>({{3,1,2,1,1}, {1, 3, 2,1,1}, {2,3,1,1,1}});
-    fits = SharingFitness(pop, DEFAULT);
+    fits = SharingFitness(pop, 2, 1, 8);
     CHECK(fits[0] == Approx(.5555556));
     CHECK(fits[1] == Approx(.333333));
     CHECK(fits[2] == Approx(.111111));
 
     pop = emp::vector<org_t>({{10,1}, {1, 10}, {1,1}});
-    fits = SharingFitness(pop, DEFAULT);
+    fits = SharingFitness(pop, 2, 1, 8);
     CHECK(fits[0] == Approx(.444444));
     CHECK(fits[1] == Approx(.444444));
     CHECK(fits[2] == Approx(.111111));
@@ -529,7 +528,7 @@ TEST_CASE("Fitness sharing", "[selection_schemes]") {
         }
     } 
 
-    fits = SharingFitness(pop, DEFAULT);
+    fits = SharingFitness(pop, 2, 1, 8);
     double total = 0;
     for (auto p : fits) {
         total += p;
