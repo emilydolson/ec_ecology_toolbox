@@ -29,7 +29,7 @@ setup(
     author_email="emilyldolson@gmail.com",
     url="https://github.com/emilydolson/ec_ecology_toolbox",
     description="Tools to analyze the ecology of evolutionary algorithms",
-    long_description="A library of tools to analyze the ecology of evolutionary algorithms",
+    long_description="Tools to analyze the ecology of evolutionary algorithms",
     ext_modules=ext_modules,
     extras_require={"test": "pytest"},
     # Currently, build_ext only provides an optional "highest supported C++
