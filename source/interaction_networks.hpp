@@ -16,41 +16,29 @@
 #include "datastructs/set_utils.hpp"
 #include "math/math.hpp"
 #include "math/distances.hpp"
-#include "tools/attrs.hpp"
 #include "datastructs/Graph.hpp"
 #include "Evolve/Resource.hpp"
 
 #include <math.h>  
 
-DEFINE_ATTR(SigmaShare);
-DEFINE_ATTR(Alpha);
-DEFINE_ATTR(Cost);
-DEFINE_ATTR(Cf);
-DEFINE_ATTR(NicheWidth);
-DEFINE_ATTR(MaxScore);
-DEFINE_ATTR(ResourceInflow);
-DEFINE_ATTR(ResourceOutflow);
-DEFINE_ATTR(MaxBonus);
-DEFINE_ATTR(TournamentSize);
-DEFINE_ATTR(Epsilon);
 
-constexpr auto DEFAULT{MakeAttrs(SigmaShare(8.0),
-                                 Alpha(1.0),
-                                 Cost(1.0),
-                                 Cf(.0025),                                 
-                                 NicheWidth(3.0),
-                                 MaxScore(10.0),
-                                 ResourceInflow(2000.0),
-                                 ResourceOutflow(.01),
-                                 MaxBonus(5.0),
-                                 TournamentSize(2),
-                                 Epsilon(0.0))};
+// constexpr auto DEFAULT{MakeAttrs(SigmaShare(8.0),
+//                                  Alpha(1.0),
+//                                  Cost(1.0),
+//                                  Cf(.0025),                                 
+//                                  NicheWidth(3.0),
+//                                  MaxScore(10.0),
+//                                  ResourceInflow(2000.0),
+//                                  ResourceOutflow(.01),
+//                                  MaxBonus(5.0),
+//                                  TournamentSize(2),
+//                                  Epsilon(0.0))};
 
-using all_attrs = emp::tools::Attrs<typename SigmaShare::value_t<double>, typename Alpha::value_t<double>, 
-                        typename Cost::value_t<double>, typename Cf::value_t<double>,
-                        typename NicheWidth::value_t<double>, typename MaxScore::value_t<double>,
-                        typename ResourceInflow::value_t<double>, typename ResourceOutflow::value_t<double>,
-                        typename MaxBonus::value_t<double>, typename TournamentSize::value_t<int>, typename Epsilon::value_t<double> >;
+// using all_attrs = emp::tools::Attrs<typename SigmaShare::value_t<double>, typename Alpha::value_t<double>, 
+//                         typename Cost::value_t<double>, typename Cf::value_t<double>,
+//                         typename NicheWidth::value_t<double>, typename MaxScore::value_t<double>,
+//                         typename ResourceInflow::value_t<double>, typename ResourceOutflow::value_t<double>,
+//                         typename MaxBonus::value_t<double>, typename TournamentSize::value_t<int>, typename Epsilon::value_t<double> >;
 
 
 // from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
@@ -515,29 +503,30 @@ void TournamentHelper(emp::vector<double> & fit_map, int t_size = 2){
 }
 
 template <typename PHEN_T>
-emp::vector<double> RandomFitness(emp::vector<PHEN_T> & pop, all_attrs attrs=DEFAULT) {
+emp::vector<double> RandomFitness(emp::vector<PHEN_T> & pop) {
     emp_assert(pop.size() > 0);
     emp::vector<double> fit_map;
     for (PHEN_T & org : pop) {
         fit_map.push_back(1.0/(double)pop.size());
     }
-    TournamentHelper(fit_map, TournamentSize::Get(attrs));
+    // TODO: Double check
+    TournamentHelper(fit_map, 1);
     return fit_map;
 }
 
 template <typename PHEN_T>
-emp::vector<double> TournamentFitness(emp::vector<PHEN_T> & pop, all_attrs attrs=DEFAULT) {
+emp::vector<double> TournamentFitness(emp::vector<PHEN_T> & pop, int t_size = 2) {
     emp_assert(pop.size() > 0);
     emp::vector<double> fit_map;
     for (PHEN_T & org : pop) {
         fit_map.push_back(emp::Sum(org));
     }
-    TournamentHelper(fit_map, TournamentSize::Get(attrs));
+    TournamentHelper(fit_map, t_size);
     return fit_map;
 }
 
 template <typename PHEN_T>
-emp::vector<double> SharingFitness(emp::vector<PHEN_T> & pop, all_attrs attrs=DEFAULT) {
+emp::vector<double> SharingFitness(emp::vector<PHEN_T> & pop, int t_size = 2, double alpha = 1, double sigma_share = 8.0) {
     // std::cout << "SHARING" << std::endl;
     emp::vector<double> fit_map;
 
@@ -554,8 +543,8 @@ emp::vector<double> SharingFitness(emp::vector<PHEN_T> & pop, all_attrs attrs=DE
             // Sharing function is euclidean distance
             // we could make this configurable
             double dist = emp::EuclideanDistance(pop[i], org2);
-            if (dist < SigmaShare::Get(attrs)) {
-                niche_count += 1 - pow((dist/SigmaShare::Get(attrs)), Alpha::Get(attrs));
+            if (dist < sigma_share) {
+                niche_count += 1 - pow((dist/sigma_share), alpha);
             } 
         }
 
@@ -563,7 +552,7 @@ emp::vector<double> SharingFitness(emp::vector<PHEN_T> & pop, all_attrs attrs=DE
         // increases its own niche count by 1
         fit_map[i] = emp::Sum(pop[i]) / niche_count;
     }
-    TournamentHelper(fit_map, TournamentSize::Get(attrs));
+    TournamentHelper(fit_map, t_size);
 
     return fit_map;    
 };
