@@ -6,8 +6,7 @@ build:
     python: "3.11"
 
 submodules:
-  include:
-    - Empirical
+  include: all
   recursive: true
 
 sphinx:
