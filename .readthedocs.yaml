@@ -5,9 +5,14 @@ build:
   tools:
     python: "3.11"
 
+submodules:
+  include:
+    - Empirical
+  recursive: true
+
 sphinx:
    configuration: docs/conf.py
-   
+
 python:
   install:
     - method: pip
