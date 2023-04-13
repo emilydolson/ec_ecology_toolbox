@@ -413,7 +413,9 @@ void TraverseDecisionTreeNaive(std::map<PHEN_T, double> & fit_map, emp::vector<P
 template <typename PHEN_T>
 emp::vector<double> LexicaseFitness(emp::vector<PHEN_T> & pop, double epsilon = 0) {
 
-    emp_assert(pop.size() > 0);
+    if (pop.size() == 0) {
+        return emp::vector<double>();
+    }
     std::map<PHEN_T, double> fit_map;
     size_t n_funs = pop[0].size();
 
