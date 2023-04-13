@@ -6,7 +6,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(ec_ecology_toolbox, m) {
-    m.doc() = "pybind11 example plugin"; // optional module docstring
+    m.doc() = "Tools for measuring the ecology of various evolutionary algorithms"; 
 
     m.def("LexicaseFitness", &LexicaseFitness<emp::vector<double>>, 
             R"mydelimiter(
@@ -20,9 +20,85 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
 
             Parameters
             ----------
-            pop: A list of lists of floats indicating the scores of a population on each test case/fitness criterion.
-            epsilon (optional): A floating point number indicating the epsilon value to use (if you want epsilon-lexicase selection probabilities; default value is 0, which is equivalent to standard lexicase selection).  
-            )mydelimiter", 
+            pop: list of lists of floats 
+              The scores of each member of the population population on each test case/fitness criterion.
+            epsilon: float
+              (optional) The epsilon value to use (if you want epsilon-lexicase selection probabilities; default value is 0, which is equivalent to standard lexicase selection).  
+
+            Returns
+            -------
+            List of floats
+              The probabilities of each individual in pop being selected by lexicase selection.            
+            )mydelimiter",
           py::arg("pop"), py::arg("epsilon") = 0.0);
-    // m.def("LexicaseFitness", [](emp::vector<emp::vector<double>> pop, double epsilon = 0){return LexicaseFitness(pop, epsilon);}, "Calculate probabilities of selection under lexicase selection");
+
+    m.def("LexicaseFitnessIndividual", &LexicaseFitnessIndividual<emp::vector<double>>, 
+            R"mydelimiter(
+            Returns the probability that a single individual is selected by lexicase selection.
+
+            Note: calculating these probabilities is an NP-Hard problem (Dolson, 2023). This function is optimized, but if you try to use it with too large of input
+            it might take a very a long time. This version is faster than LexicaseFitness if you just need the probability for a single individual, but is still worst-case O(N!)
+
+            Parameters
+            ----------
+            pop: list of lists of floats 
+              The scores of a population on each test case/fitness criterion.
+            i: int
+              The index of the individual in pop to calculate selection probability for
+            epsilon: float
+              (optional) The epsilon value to use (if you want epsilon-lexicase selection probabilities; default value is 0, which is equivalent to standard lexicase selection).  
+            
+            Returns
+            -------
+            float
+              The probability of individual i being selected by lexicase selection.
+            )mydelimiter", 
+          py::arg("pop"), py::arg("i"), py::arg("epsilon") = 0.0);
+
+    m.def("SharingFitness", &SharingFitness<emp::vector<double>>, 
+            R"mydelimiter(
+            Return a vector containing the probability that each member of the population will be selected under tournament selection with fitness sharing.
+
+            The numbers in the pop parameter are assumed to be scores on a set of test cases/fitness criteria/tasks.
+            Similarity will be calculated as the euclidean distance between these scores.
+            Overall "Fitness" will be calculated as the sum of these scores, divided by the fitness sharing niche count.
+
+            Parameters
+            ----------
+            pop: list of lists of floats 
+              The scores of each member of the population population on each test case/fitness criterion.
+            t_size: int
+              Tournament size; the number of individuals that will be randomly selected to compete against each other in each selection event.
+            alpha: float
+              The alpha parameter of the fitness sharing function (controls shape of the sharing function)
+            sigma_share: float
+              The sharing threshold (i.e. how similar do individuals need to be to share fitness)
+
+            Returns
+            -------
+            List of floats
+              The probabilities of each individual in pop being selected.            
+            )mydelimiter",
+          py::arg("pop"), py::arg("t_size") = 2, py::arg("alpha") = 1, py::arg("sigma_share") = 8.0);
+
+    m.def("TournamentFitness", &TournamentFitness<emp::vector<double>>, 
+            R"mydelimiter(
+            Return a vector containing the probability that each member of the population will be selected under tournament selection.
+
+            The numbers in the pop parameter are assumed to be scores on a set of test cases/fitness criteria/tasks.
+            Overall "Fitness" will be calculated as the sum of these scores.
+
+            Parameters
+            ----------
+            pop: list of lists of floats 
+              The scores of each member of the population population on each test case/fitness criterion.
+            t_size: int
+              Tournament size; the number of individuals that will be randomly selected to compete against each other in each selection event.
+
+            Returns
+            -------
+            List of floats
+              The probabilities of each individual in pop being selected.            
+            )mydelimiter",
+          py::arg("pop"), py::arg("t_size") = 2);
 }
