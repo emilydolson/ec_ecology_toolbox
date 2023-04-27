@@ -330,7 +330,7 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     CHECK(fits_d[2] == Approx(.75));
 
     emp::Random r;
-    r.ResetSeed(1);
+    r.ResetSeed(2);
 
     pop.clear();
     pop.resize(10);
@@ -464,11 +464,11 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     CHECK(total == Approx(1));
 
     pop.clear();
-    pop.resize(200);
+    pop.resize(300);
 
-    for (int org = 0; org < 200; ++org) {
+    for (int org = 0; org < 300; ++org) {
         // pop[org].resize(18);
-        for (int loc = 0; loc < 200; ++loc) {
+        for (int loc = 0; loc < 300; ++loc) {
             pop[org].push_back(r.GetGeometric(.5));
         }
     } 
@@ -722,7 +722,10 @@ TEST_CASE("Calc competition", "[helpers]") {
 
 TEST_CASE("Test epsilon lexicase") {
 
-    emp::vector<org_t> pop({{1,0,0,0,0}, {0, 0, 0, 0, 0}, {0,0,0,0,1}, {0,0,0,1,0}});
+    emp::vector<org_t> pop({{1, 0, 0, 0, 0}, 
+                            {0, 0, 0, 0, 0}, 
+                            {0, 0, 0, 0, 1}, 
+                            {0, 0, 0, 1, 0}});
     fit_map_t fits = LexicaseFitness(pop, 2);
     for (auto & o : fits) {
         CHECK(o == Approx(.25));

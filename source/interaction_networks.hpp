@@ -261,7 +261,7 @@ void DeDuplicateAxes(emp::vector<int> & axes, emp::vector<PHEN_T> & pop, std::ma
 }
 
 template <typename PHEN_T>
-void HandleTwoOrgs(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & winners, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0) {
+void HandleTwoOrgs(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & winners, emp::vector<int> axes, emp::vector<int> perm_levels, std::map<int,int> dups, double epsilon = 0, double multiplier=1.0) {
     double wins = 0;
     double losses = 0;
     for (int ax : axes) {
@@ -272,11 +272,11 @@ void HandleTwoOrgs(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & win
         }
     }
     if (wins > 0 || losses > 0) {
-        fit_map[winners[0]] += (wins/(wins+losses)) * (1.0/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);
-        fit_map[winners[1]] += (losses/(wins+losses)) * (1.0/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);
+        fit_map[winners[0]] += (wins/(wins+losses)) * (multiplier/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);
+        fit_map[winners[1]] += (losses/(wins+losses)) * (multiplier/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);
     } else {
-        fit_map[winners[0]] += .5 * (1.0/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);
-        fit_map[winners[1]] += .5 * (1.0/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);                
+        fit_map[winners[0]] += .5 * (multiplier/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);
+        fit_map[winners[1]] += .5 * (multiplier/VectorProduct(perm_levels));//(double)emp::Factorial(axes.size() - 1);                
     }
 }
 
@@ -355,7 +355,7 @@ double TraverseDecisionTreeIndividual(emp::vector<PHEN_T> & pop, emp::vector<int
 }
 
 template <typename PHEN_T>
-void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0) {
+void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, std::map<int,int> dups, double epsilon = 0, double multiplier = 1.0) {
     // std::cout << "begining round of recursion " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << std::endl;
 
     // std::cout << emp::to_string(pop) << emp::to_string(axes) << std::endl;
@@ -363,13 +363,12 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
     emp_assert(pop.size() > 0, axes, perm_levels);
     emp_assert(axes.size() > 0, axes, perm_levels);
 
-
     // There's only one fitness criterion left, so it wins
     if (axes.size() == 1) {
         emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
         // std::cout << "Winners: " << emp::to_string(winners) << std::endl;
         for (PHEN_T & org : winners) {
-            fit_map[org]+=1.0/((double)winners.size()*VectorProduct(perm_levels));
+            fit_map[org]+=multiplier*dups[axes[0]]/((double)winners.size()*VectorProduct(perm_levels));
         }
         return;
     }
@@ -380,26 +379,34 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
         // emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
         // std::cout << "Winners: " << emp::to_string(winners) << std::endl;
         for (PHEN_T & org : pop) {
-            fit_map[org]+=1.0/VectorProduct(perm_levels);
+            fit_map[org]+=multiplier/VectorProduct(perm_levels);
         }
         return;
     }
 
     PruneAxes(axes, pop, epsilon);
+    DeDuplicateAxes(axes, pop, dups);
+
+    int real_axes = 0;
+    for (int ax : axes){
+        real_axes += dups[ax];
+    }
+
     if (axes.size() == 0) {
         for (PHEN_T & org : pop) {
-            fit_map[org]+=1.0/((double)pop.size()*VectorProduct(perm_levels));
+            fit_map[org]+=multiplier/((double)pop.size()*VectorProduct(perm_levels));
         }        
         return;
     }
-    perm_levels.push_back(axes.size());
+
+    perm_levels.push_back(real_axes);
 
     // Check for only one axis again now that we've pruned the axes
     if (axes.size() == 1) {
         emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
         // std::cout << "Winners: " << emp::to_string(winners) << std::endl;
         for (PHEN_T & org : winners) {
-            fit_map[org]+=1.0/((double)winners.size()*VectorProduct(perm_levels));
+            fit_map[org]+=multiplier*real_axes*dups[axes[0]]/((double)winners.size()*VectorProduct(perm_levels));
         }
         return;
     }
@@ -418,17 +425,18 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
         } else {
             FilterDominated(winners, next_axes, epsilon);
         }
+        
+        double new_multiplier = multiplier * dups[ax];
 
         if (winners.size() == 1) { // Not a tie
             // std::cout << "1 winner: " << emp::to_string(winners[0]) << " Controls " << (double)emp::Factorial(axes.size() - 1)<< std::endl;
-            fit_map[winners[0]] += 1.0/VectorProduct(perm_levels);//(double)emp::Factorial(axes.size() - 1);
+            fit_map[winners[0]] += new_multiplier/VectorProduct(perm_levels);//(double)emp::Factorial(axes.size() - 1);
         } else if (winners.size() == 2) { // optimization
-            HandleTwoOrgs(fit_map, winners, next_axes, perm_levels, epsilon);
+            HandleTwoOrgs(fit_map, winners, next_axes, perm_levels, dups, epsilon, new_multiplier);
         // } else if (winners.size() < 100 && next_axes.size() > 2) { // optimization
         //     HandleThreeOrgs(fit_map, winners, next_axes, perm_levels, epsilon);
         } else { // tie
-            // DeDuplicateAxes(next_axes, winners, dups);     
-            TraverseDecisionTree(fit_map, winners, next_axes, perm_levels, epsilon);
+            TraverseDecisionTree(fit_map, winners, next_axes, perm_levels, dups, epsilon, new_multiplier);
         }
     }
 }
@@ -458,7 +466,7 @@ void TraverseDecisionTreeNaive(std::map<PHEN_T, double> & fit_map, emp::vector<P
         return;
     }
 
-    perm_levels.push_back(axes.size());std::map<int,int> dups,
+    perm_levels.push_back(axes.size());
 
     for (int ax : axes) {
         emp::vector<PHEN_T> winners = FindHighest(pop, ax, epsilon);
@@ -481,6 +489,11 @@ emp::vector<double> LexicaseFitness(emp::vector<PHEN_T> & pop, double epsilon = 
 
     for (PHEN_T & org : pop) {
         fit_map[org] = 0.0;
+    }
+
+    std::map<int,int> dups;
+    for (int i = 0; i < n_funs; i++) {
+        dups[i] = 1;
     }
 
     emp::vector<PHEN_T> de_dup_pop = emp::RemoveDuplicates(pop);
