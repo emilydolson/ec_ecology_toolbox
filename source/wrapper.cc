@@ -1,5 +1,6 @@
 
 #include "interaction_networks.hpp"
+#include "Evolve/NK.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -101,4 +102,11 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
               The probabilities of each individual in pop being selected.            
             )mydelimiter",
           py::arg("pop"), py::arg("t_size") = 2);
+
+    py::class_<emp::Random>(m, "Random")
+      .def(py::init<int>());
+
+    py::class_<emp::NKLandscape>(m, "NKLandscape")
+      .def(py::init<size_t, size_t, emp::Random&>())
+      .def("GetFitness", static_cast<double (emp::NKLandscape::*)(size_t, size_t) const>(&emp::NKLandscape::GetFitness));
 }

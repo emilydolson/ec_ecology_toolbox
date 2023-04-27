@@ -9,7 +9,7 @@ CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/
 CXX := clang++
 CXX_nat := $(CXX)
 CFLAGS_nat := -O3 -DNDEBUG $(CFLAGS_all)
-CFLAGS_nat_debug := -fprofile-arcs -ftest-coverage -g $(CFLAGS_all)
+CFLAGS_nat_debug := -ftest-coverage -g $(CFLAGS_all)
 CFLAGS_nat_profile := -fprofile-arcs -ftest-coverage -pg $(CFLAGS_all)
 
 # Emscripten compiler information
@@ -25,7 +25,7 @@ default: test
 
 test: tests/test_interaction_networks.cc
 	$(CXX_nat) $(CFLAGS_nat_debug) tests/test_interaction_networks.cc -o test
-	./test
+	time ./test
 
 profile: tests/test_interaction_networks.cc
 	$(CXX_nat) $(CFLAGS_nat_profile) tests/test_interaction_networks.cc -o test

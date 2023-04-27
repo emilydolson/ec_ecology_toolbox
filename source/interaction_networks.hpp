@@ -153,6 +153,40 @@ void FilterImpossible(emp::vector<PHEN_T> & pop, emp::vector<int> & axes, double
 }
 
 template <typename PHEN_T>
+void FilterDominated(emp::vector<PHEN_T> & pop, emp::vector<int> & axes, double epsilon = 0) {
+    emp::vector<int> to_remove;
+    
+    for (int i = 0; i < pop.size(); i++) {
+        for (int j = 0; j < pop.size(); j++) {
+            if (i == j) {
+                continue;
+            }
+            bool losses = false;
+            bool wins = false;
+            for (int ax : axes) {
+                if (pop[i][ax] + epsilon < pop[j][ax]) {
+                    losses = true;
+                } else if (pop[i][ax] - epsilon > pop[j][ax]) {
+                    wins = true;
+                    break;
+                } 
+            }
+            if (losses && !wins) {
+                to_remove.push_back(i);
+                break;
+            }
+        }
+    }
+    // if (pop.size() < 10 && axes.size() < 6) {
+    //     std::cout << emp::to_string(pop) << emp::to_string(axes) << emp::to_string(to_remove) << std::endl;
+    // }
+    for (emp::vector<int>::reverse_iterator i = to_remove.rbegin(); i != to_remove.rend(); ++i ) {
+        pop.erase(pop.begin()+(*i));
+    }
+}
+
+
+template <typename PHEN_T>
 void PruneAxes(emp::vector<int> & axes, emp::vector<PHEN_T> & pop, double epsilon = 0) {
     
     emp::vector<int> to_remove;
@@ -165,7 +199,7 @@ void PruneAxes(emp::vector<int> & axes, emp::vector<PHEN_T> & pop, double epsilo
         for (PHEN_T & org : pop) {
             if (org[ax] > best) {
                 // std::cout << org[ax] << " > "<< best << std::endl;
-                if (org[ax] > lowest + epsilon) {
+                if (org[ax] - epsilon > lowest) {
                     // std::cout <<" Including  "<< ax << std::endl;
                     include = true;
                     break;
@@ -186,20 +220,55 @@ void PruneAxes(emp::vector<int> & axes, emp::vector<PHEN_T> & pop, double epsilo
             to_remove.push_back(ax);
         }
     }
+
     for (int ax : to_remove) {
         axes.erase(std::remove(axes.begin(), axes.end(), ax), axes.end());
     }
 }
 
 template <typename PHEN_T>
-void HandleTwoOrgs(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & winners, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0, emp::vector<int> active_set = {}) {
+void DeDuplicateAxes(emp::vector<int> & axes, emp::vector<PHEN_T> & pop, std::map<int, int> & dups) {
+    emp::vector<int> to_remove;
+    for (int ax : axes) {
+        if (emp::Has(to_remove, ax)) {
+            continue;
+        }
+        for (int ax2 : axes) {
+            if (emp::Has(to_remove, ax2)) {
+                continue;
+            }
+            if (ax == ax2) {
+                continue;
+            }
+            bool same = true;
+            for (PHEN_T & org : pop) {
+                if (org[ax] != org[ax2]) {
+                    same = false;
+                    break;
+                }
+            }
+            if (same) {
+                to_remove.push_back(ax2);
+                dups[ax] += dups[ax2];
+            }
+        }
+    }
+
+    for (int ax : to_remove) {
+        axes.erase(std::remove(axes.begin(), axes.end(), ax), axes.end());
+    }
+
+}
+
+template <typename PHEN_T>
+void HandleTwoOrgs(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & winners, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0) {
     double wins = 0;
     double losses = 0;
     for (int ax : axes) {
         if (winners[0][ax] > winners[1][ax] + epsilon) {
-            wins++;
+            wins += dups[ax];
         } else if (winners[1][ax] > winners[0][ax] + epsilon) {
-            losses++;
+            losses += dups[ax];
         }
     }
     if (wins > 0 || losses > 0) {
@@ -212,7 +281,7 @@ void HandleTwoOrgs(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & win
 }
 
 template <typename PHEN_T>
-double HandleTwoOrgsIndividual(emp::vector<PHEN_T> & winners, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0, emp::vector<int> active_set = {}) {
+double HandleTwoOrgsIndividual(emp::vector<PHEN_T> & winners, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0) {
     double wins = 0;
     double losses = 0;
 
@@ -231,7 +300,7 @@ double HandleTwoOrgsIndividual(emp::vector<PHEN_T> & winners, emp::vector<int> a
 }
 
 template <typename PHEN_T>
-double TraverseDecisionTreeIndividual(emp::vector<PHEN_T> & pop, emp::vector<int> axes, PHEN_T individual, emp::vector<int> perm_levels, double epsilon = 0, emp::vector<int> active_set = {}) {
+double TraverseDecisionTreeIndividual(emp::vector<PHEN_T> & pop, emp::vector<int> axes, PHEN_T individual, emp::vector<int> perm_levels, double epsilon = 0) {
     // std::cout << "begining round of recursion " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << std::endl;
 
     // std::cout << emp::to_string(pop) << emp::to_string(axes) << std::endl;
@@ -286,13 +355,14 @@ double TraverseDecisionTreeIndividual(emp::vector<PHEN_T> & pop, emp::vector<int
 }
 
 template <typename PHEN_T>
-void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0, emp::vector<int> active_set = {}) {
+void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0) {
     // std::cout << "begining round of recursion " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << std::endl;
 
     // std::cout << emp::to_string(pop) << emp::to_string(axes) << std::endl;
  
     emp_assert(pop.size() > 0, axes, perm_levels);
     emp_assert(axes.size() > 0, axes, perm_levels);
+
 
     // There's only one fitness criterion left, so it wins
     if (axes.size() == 1) {
@@ -324,9 +394,6 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
     }
     perm_levels.push_back(axes.size());
 
-
-    FilterImpossible(pop, axes, epsilon);
-
     // Check for only one axis again now that we've pruned the axes
     if (axes.size() == 1) {
         emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
@@ -337,18 +404,6 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
         return;
     }
 
-    // Check again now that we've filtered out members of the population that won't win
-    // There's only one thing in the population, so it wins
-    // if (pop.size() == 1) {
-    //     emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
-    //     // std::cout << "Winners: " << emp::to_string(winners) << std::endl;
-    //     for (PHEN_T & org : winners) {
-    //         fit_map[org]+=1.0/VectorProduct(perm_levels);
-    //     }
-    //     return;
-    // }
-
-
     // std::cout << "post processing: " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << std::endl;
 
     for (int ax : axes) {
@@ -358,7 +413,11 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
         emp::vector<PHEN_T> winners = FindHighest(pop, ax, epsilon);
         emp::vector<int> next_axes = axes;
         next_axes.erase(std::remove(next_axes.begin(), next_axes.end(), ax), next_axes.end());
-        FilterImpossible(winners, next_axes, epsilon);
+        if (epsilon) {
+            FilterImpossible(winners, next_axes, epsilon);
+        } else {
+            FilterDominated(winners, next_axes, epsilon);
+        }
 
         if (winners.size() == 1) { // Not a tie
             // std::cout << "1 winner: " << emp::to_string(winners[0]) << " Controls " << (double)emp::Factorial(axes.size() - 1)<< std::endl;
@@ -368,13 +427,14 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
         // } else if (winners.size() < 100 && next_axes.size() > 2) { // optimization
         //     HandleThreeOrgs(fit_map, winners, next_axes, perm_levels, epsilon);
         } else { // tie
+            // DeDuplicateAxes(next_axes, winners, dups);     
             TraverseDecisionTree(fit_map, winners, next_axes, perm_levels, epsilon);
         }
     }
 }
 
 template <typename PHEN_T>
-void TraverseDecisionTreeNaive(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0, emp::vector<int> active_set = {}) {
+void TraverseDecisionTreeNaive(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, double epsilon = 0) {
     // std::cout << "begining round of recursion " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << std::endl;
 
     // std::cout << emp::to_string(pop) << emp::to_string(axes) << std::endl;
@@ -398,7 +458,7 @@ void TraverseDecisionTreeNaive(std::map<PHEN_T, double> & fit_map, emp::vector<P
         return;
     }
 
-    perm_levels.push_back(axes.size());
+    perm_levels.push_back(axes.size());std::map<int,int> dups,
 
     for (int ax : axes) {
         emp::vector<PHEN_T> winners = FindHighest(pop, ax, epsilon);
@@ -424,7 +484,7 @@ emp::vector<double> LexicaseFitness(emp::vector<PHEN_T> & pop, double epsilon = 
     }
 
     emp::vector<PHEN_T> de_dup_pop = emp::RemoveDuplicates(pop);
-    TraverseDecisionTree(fit_map, de_dup_pop, emp::NRange(0, (int)n_funs), {}, epsilon);
+    TraverseDecisionTree(fit_map, de_dup_pop, emp::NRange(0, (int)n_funs), {}, dups, epsilon);
 
     for (PHEN_T & org : de_dup_pop) {
         fit_map[org] /= emp::Count(pop, org);

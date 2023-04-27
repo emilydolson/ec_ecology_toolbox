@@ -74,3 +74,9 @@ def test_tournament_prob():
     assert result[2] == pytest.approx(1 - (2/3)**3)
     assert result[0] == pytest.approx(((2/3)**3)/2)
     assert result[1] == pytest.approx(((2/3)**3)/2)
+
+
+def test_nk():
+    r = eco.Random(-1)
+    nk = eco.NKLandscape(8, 2, r)
+    print(nk.GetFitness(0, 1))

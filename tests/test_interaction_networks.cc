@@ -304,7 +304,9 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     CHECK(fits[1] == Approx(.333333));
     CHECK(fits[2] == Approx(.16666667));
 
-    emp::vector<emp::vector<double>> pop_d = emp::vector<emp::vector<double>>({{3.1,1.1,2.1,1.1,1.1}, {1.1, 3.1, 2.1,1.1,1.1}, {2.1,3.1,1.1,1.1,1.1}});
+    emp::vector<emp::vector<double>> pop_d = emp::vector<emp::vector<double>>({{3.1, 1.1, 2.1, 1.1, 1.1}, 
+                                                                               {1.1, 3.1, 2.1, 1.1, 1.1}, 
+                                                                               {2.1, 3.1, 1.1, 1.1, 1.1}});
     emp::vector<double> fits_d = LexicaseFitness(pop_d);
     CHECK(fits_d[0] == Approx(.5));
     CHECK(fits_d[1] == Approx(.333333));
@@ -314,7 +316,7 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     CHECK(fits_d[1] == Approx(.333333));
     CHECK(fits_d[2] == Approx(.16666667));
 
-    fits_d = LexicaseFitness(pop_d, 1.0);
+    fits_d = LexicaseFitness(pop_d, 1.1);
     CHECK(fits_d[0] == Approx(0));
     CHECK(fits_d[0] == Approx(LexicaseFitnessIndividual(pop, 0, 1.0)));
     CHECK(fits_d[1] == Approx(.25));
@@ -328,6 +330,7 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     CHECK(fits_d[2] == Approx(.75));
 
     emp::Random r;
+    r.ResetSeed(1);
 
     pop.clear();
     pop.resize(10);
@@ -449,6 +452,23 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     for (int org = 0; org < 20; ++org) {
         // pop[org].resize(18);
         for (int loc = 0; loc < 18; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop);
+    total = 0;
+    for (auto p : fits) {
+        total += p;
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(200);
+
+    for (int org = 0; org < 200; ++org) {
+        // pop[org].resize(18);
+        for (int loc = 0; loc < 200; ++loc) {
             pop[org].push_back(r.GetGeometric(.5));
         }
     } 
