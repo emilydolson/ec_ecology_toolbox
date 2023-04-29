@@ -19,26 +19,6 @@
 
 #include <math.h>  
 
-
-// constexpr auto DEFAULT{MakeAttrs(SigmaShare(8.0),
-//                                  Alpha(1.0),
-//                                  Cost(1.0),
-//                                  Cf(.0025),                                 
-//                                  NicheWidth(3.0),
-//                                  MaxScore(10.0),
-//                                  ResourceInflow(2000.0),
-//                                  ResourceOutflow(.01),
-//                                  MaxBonus(5.0),
-//                                  TournamentSize(2),
-//                                  Epsilon(0.0))};
-
-// using all_attrs = emp::tools::Attrs<typename SigmaShare::value_t<double>, typename Alpha::value_t<double>, 
-//                         typename Cost::value_t<double>, typename Cf::value_t<double>,
-//                         typename NicheWidth::value_t<double>, typename MaxScore::value_t<double>,
-//                         typename ResourceInflow::value_t<double>, typename ResourceOutflow::value_t<double>,
-//                         typename MaxBonus::value_t<double>, typename TournamentSize::value_t<int>, typename Epsilon::value_t<double> >;
-
-
 // from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
 template<class T, class U>
 typename std::enable_if<!std::numeric_limits<T>::is_integer || !std::numeric_limits<U>::is_integer, bool>::type
@@ -57,6 +37,46 @@ typename std::enable_if<std::numeric_limits<T>::is_integer && std::numeric_limit
     almost_equal(T x, U y, int ulp)
 {
     return x == y;
+}
+
+// from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
+template<class T, class U>
+typename std::enable_if<!std::numeric_limits<T>::is_integer || !std::numeric_limits<U>::is_integer, bool>::type
+    lt_almost_equal(T x, U y, int ulp)
+{
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return x-y <= std::numeric_limits<T>::epsilon() * std::abs(x+y) * ulp
+    // unless the result is subnormal
+           || x-y < std::numeric_limits<T>::min();
+}
+
+// integer version - just use the equals operator
+template<class T, class U>
+typename std::enable_if<std::numeric_limits<T>::is_integer && std::numeric_limits<U>::is_integer, bool>::type
+    lt_almost_equal(T x, U y, int ulp)
+{
+    return x <= y;
+}
+
+// from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
+template<class T, class U>
+typename std::enable_if<!std::numeric_limits<T>::is_integer || !std::numeric_limits<U>::is_integer, bool>::type
+    gt_almost_equal(T x, U y, int ulp)
+{
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return y-x <= std::numeric_limits<T>::epsilon() * std::abs(x+y) * ulp
+    // unless the result is subnormal
+           || y-x < std::numeric_limits<T>::min();
+}
+
+// integer version - just use the equals operator
+template<class T, class U>
+typename std::enable_if<std::numeric_limits<T>::is_integer && std::numeric_limits<U>::is_integer, bool>::type
+    gt_almost_equal(T x, U y, int ulp)
+{
+    return x >= y;
 }
 
 /// Find the elements in @param pop with the highest value on
@@ -81,7 +101,7 @@ emp::vector<int> FindHighestIndices(emp::vector<PHEN_T> & pop, int axis, double 
     if (epsilon) {
         winners.resize(0);
         for (size_t i = 0; i < pop.size(); i++) {
-            if (pop[i][axis] + epsilon >= best) {
+            if (gt_almost_equal(pop[i][axis] + epsilon, best, 5)) {
                 winners.push_back(i);
             }
         }
@@ -94,7 +114,7 @@ bool IsElite(emp::vector<PHEN_T> & pop, int axis, PHEN_T individual, double epsi
     double best = individual[axis];
 
     for (size_t i = 0; i < pop.size(); i++) {
-        if (pop[i][axis] > best + epsilon) {
+        if (!lt_almost_equal(pop[i][axis], best + epsilon, 5)) {
             return false;
         }
     }
@@ -330,9 +350,12 @@ double TraverseDecisionTreeIndividual(emp::vector<PHEN_T> & pop, emp::vector<int
     for (int ax : FindWinningAxes(pop, axes, individual, epsilon)) {
         emp::vector<PHEN_T> winners = FindHighest(pop, ax, epsilon);
         emp::vector<int> next_axes = axes;
+        emp_assert(emp::Has(winners, individual), pop, winners, individual, epsilon, ax);
         next_axes.erase(std::remove(next_axes.begin(), next_axes.end(), ax), next_axes.end());
         FilterImpossible(winners, next_axes, epsilon);
 
+        // Check whether individual got filtered out by FilterImpossible
+        // which can happen if ax was the last remaining criterion it wins on
         if (!emp::Has(winners, individual)) {
             continue;
         }

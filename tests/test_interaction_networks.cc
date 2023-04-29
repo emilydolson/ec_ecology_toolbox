@@ -8,6 +8,25 @@
 using org_t = emp::vector<int>;
 using fit_map_t = emp::vector<double>;
 
+TEST_CASE("FloatingPointLogic", "[helpers]") {
+    CHECK(gt_almost_equal(5.2, 3.1, 5));
+    CHECK(!gt_almost_equal(3.1, 5.2, 5));
+    CHECK(gt_almost_equal(5.2, 5.2, 5));
+    CHECK(gt_almost_equal(5, 3, 5));
+    CHECK(!gt_almost_equal(3, 5, 5));
+    CHECK(gt_almost_equal(5, 5, 5));
+    CHECK(!gt_almost_equal(5.1, 5.2, 5));
+
+    CHECK(!lt_almost_equal(5.2, 3.1, 5));
+    CHECK(lt_almost_equal(3.1, 5.2, 5));
+    CHECK(lt_almost_equal(5.2, 5.2, 5));
+    CHECK(!lt_almost_equal(5, 3, 5));
+    CHECK(lt_almost_equal(3, 5, 5));
+    CHECK(lt_almost_equal(5, 5, 5));
+    CHECK(lt_almost_equal(5.1, 5.2, 5));
+
+}
+
 TEST_CASE("VectorProduct", "[helpers]") {
     emp::vector<int> v({5,2,8});
     CHECK(VectorProduct(v) == 80);
@@ -316,7 +335,7 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     CHECK(fits_d[1] == Approx(.333333));
     CHECK(fits_d[2] == Approx(.16666667));
 
-    fits_d = LexicaseFitness(pop_d, 1.1);
+    fits_d = LexicaseFitness(pop_d, 1.0);
     CHECK(fits_d[0] == Approx(0));
     CHECK(fits_d[0] == Approx(LexicaseFitnessIndividual(pop, 0, 1.0)));
     CHECK(fits_d[1] == Approx(.25));
