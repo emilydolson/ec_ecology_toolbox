@@ -13,9 +13,18 @@ def test_lex_prob():
     assert eco.LexicaseFitness([[]]) == [1]
 
 
-def test_benchmark_lex_prob(benchmark):
+@pytest.mark.parametrize("seed, n, m",
+                         [(1, 10, 10),
+                          (2, 10, 20),
+                          (3, 10, 30),
+                          (4, 20, 10),
+                          (5, 20, 20),
+                          (6, 20, 30),
+                          (7, 30, 30)])
+def test_benchmark_lex_prob(benchmark, seed, n, m):
+    random.seed(seed)
     benchmark(eco.LexicaseFitness,
-              [[random.randint(0, 1) for i in range(10)] for j in range(10)])
+              [[random.randint(0, 1) for i in range(n)] for j in range(m)])
 
 
 def test_lex_prob_individual():
