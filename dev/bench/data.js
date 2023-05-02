@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1682991607142,
+  "lastUpdate": 1682991608415,
   "repoUrl": "https://github.com/emilydolson/ec_ecology_toolbox",
   "entries": {
     "Python Benchmark with pytest-benchmark": [
@@ -217,6 +217,37 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0000023411266046251203",
             "extra": "mean: 272.6816711878147 usec\nrounds: 3023"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "emilyldolson@gmail.com",
+            "name": "Emily Dolson",
+            "username": "emilydolson"
+          },
+          "committer": {
+            "email": "emilyldolson@gmail.com",
+            "name": "Emily Dolson",
+            "username": "emilydolson"
+          },
+          "distinct": true,
+          "id": "c391d2dc131fe1385fa65347608d53ad0c9e35b9",
+          "message": "Fix permissions",
+          "timestamp": "2023-05-01T21:38:55-04:00",
+          "tree_id": "4d522221267fdb9e4190aa51552400c337343728",
+          "url": "https://github.com/emilydolson/ec_ecology_toolbox/commit/c391d2dc131fe1385fa65347608d53ad0c9e35b9"
+        },
+        "date": 1682991593581,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob",
+            "value": 2975.7770108723953,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000008366630707419987",
+            "extra": "mean: 336.0466850662424 usec\nrounds: 2337"
           }
         ]
       }
