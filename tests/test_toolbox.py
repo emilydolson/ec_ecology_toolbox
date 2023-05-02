@@ -1,4 +1,5 @@
 import ec_ecology_toolbox as eco
+import random
 import pytest
 
 
@@ -10,6 +11,11 @@ def test_lex_prob():
     assert result[1] == pytest.approx(.6666666667)
     assert eco.LexicaseFitness([]) == []
     assert eco.LexicaseFitness([[]]) == [1]
+
+
+def test_benchmark_lex_prob(benchmark):
+    benchmark(eco.LexicaseFitness,
+              [[random.randint(0, 1) for i in range(10)] for j in range(10)])
 
 
 def test_lex_prob_individual():
