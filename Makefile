@@ -3,13 +3,13 @@ PROJECT := evo_comp_ecology
 EMP_DIR := third-party/Empirical/include/emp
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/
+CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/ -Ithird-party/discreture/include/Discreture
 
 # Native compiler information
 CXX := clang++
 CXX_nat := $(CXX)
 CFLAGS_nat := -O3 -DNDEBUG $(CFLAGS_all)
-CFLAGS_nat_debug := -fprofile-arcs -ftest-coverage -g $(CFLAGS_all)
+CFLAGS_nat_debug := -DEMP_TRACK_MEM -fprofile-arcs -ftest-coverage -g $(CFLAGS_all)
 CFLAGS_nat_profile := -fprofile-arcs -ftest-coverage -pg $(CFLAGS_all)
 
 # Emscripten compiler information
@@ -26,6 +26,11 @@ default: test
 test: tests/test_interaction_networks.cc
 	$(CXX_nat) $(CFLAGS_nat_debug) tests/test_interaction_networks.cc -o test
 	time ./test
+
+test-cag: tests/test_cag.cpp
+	$(CXX_nat) $(CFLAGS_nat_debug) tests/test_cag.cpp -o test-cag
+	time ./test-cag
+
 
 profile: tests/test_interaction_networks.cc
 	$(CXX_nat) $(CFLAGS_nat_profile) tests/test_interaction_networks.cc -o test

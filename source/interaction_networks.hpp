@@ -5,6 +5,7 @@
 #include <map>
 #include <limits>
 #include <unordered_set>
+#include <queue>
 
 #include "base/vector.hpp"
 #include "base/assert.hpp"
@@ -23,6 +24,8 @@
 
 struct Axis {
     int dups = 1;
+    int bonus_dups = 0;
+    emp::vector<int> sub_axes;
     int orig_id;
     int curr_id;
     Axis(int id) {
@@ -1169,6 +1172,7 @@ struct Node {
     std::map<int, long long unsigned int> seq_counts;
     std::set<emp::Ptr<Node>> children;
     int free_axes = 0;
+    int real_axes = 0;
     Node(std::set<Axis> ax) {
         axes = ax;
     }
@@ -1212,100 +1216,136 @@ double SolveBinary(emp::vector<PHEN_T> & pop, int ind) {
     int n_real_axes = all_axes.size();
     DeDuplicateAxes(all_axes, pop);
 
-    emp::vector<emp::Ptr<Node>> start_nodes(0);
+    for (Axis & ax1 : all_axes) {
+        if (!pop[ind][ax1.curr_id]) {
+            continue;
+        }
+        for (Axis & ax2 : all_axes) {
+            if (ax1 == ax2) {
+                continue;
+            }
+            bool subset = true;
+            for (int i = 0; i < pop.size(); i++) {
+                if (i == ind) {
+                    continue;
+                }
+                if (pop[i][ax1.curr_id] && !pop[i][ax2.curr_id]) {
+                    subset = false;
+                }
+            }
+            if (subset) {
+                ax1.sub_axes.push_back(ax2.curr_id);
+                ax1.bonus_dups += ax2.dups;
+            }
+
+        }
+    }
+
+    auto cmp = [](emp::Ptr<Node> left, emp::Ptr<Node> right) { return left->axes.size() > right->axes.size(); };
+    std::priority_queue<emp::Ptr<Node>, std::vector<emp::Ptr<Node>>, decltype(cmp)> pq(cmp);
+
+    // emp::vector<emp::Ptr<Node>> start_nodes(0);
     for (Axis & ax : all_axes) {
         if (pop[ind][ax.curr_id]) {
             nodes[{ax}] = Node({ax});
             emp::Ptr<Node> curr_node = &nodes[{ax}];
-            start_nodes.push_back(curr_node);
-            for (int i = 1; i <= ax.dups; i++) {
-                curr_node->seq_counts[i] = FactorialDiff(ax.dups, ax.dups - i);
+            curr_node->real_axes = 1;
+            pq.push(curr_node);
+            curr_node->axes.insert(ax.sub_axes.begin(), ax.sub_axes.end());
+            for (int i = 1; i <= ax.dups + ax.bonus_dups; i++) {
+                int avail = ax.dups + ax.bonus_dups - 1;
+                curr_node->seq_counts[i] = ax.dups * FactorialDiff(avail, avail - i + 1);
             }
-            curr_node->free_axes = ax.dups - 1;
+            curr_node->free_axes = ax.dups + ax.bonus_dups - 1;
         }
     }
 
-    if (start_nodes.size() == 0) {
-        return 0;
-    }
 
-    emp::vector<emp::Ptr<Node>> curr_nodes = start_nodes;
-    emp::vector<emp::Ptr<Node>> next_nodes;
-    for (int depth = 2; depth <= all_axes.size(); depth++) {
-        for (emp::Ptr<Node> n : curr_nodes ) {
-            for (Axis & ax : all_axes) {
-                if (!emp::Has(n->axes, ax)) {
-                    bool can_use = true;
-                    if (!pop[ind][ax.curr_id]) {
-                        // for (int j = 0; j < pop.size(); j++) {
-                        //     if (pop[j][ax.curr_id] && std::all_of(n->axes.begin(), n->axes.end(), [j, &pop](const Axis & x){return pop[j][x.curr_id];})) {
-                        //         can_use = false;
-                        //         break;
-                        //     }
-                        // }
-                        // Identify members of current set that have
-                        // 1s for individual
-                        // Try choosing all of those, then all of the others,
-                        // then new axis. See if that actually works.
-                        // if (can_use) {
-                            emp::vector<Axis> ones;
-                            emp::vector<Axis> zeros;
+    // emp::vector<emp::Ptr<Node>> curr_nodes = start_nodes;
+    // emp::vector<emp::Ptr<Node>> next_nodes;
+    // for (int depth = 2; depth <= all_axes.size(); depth++) {
+    //     for (emp::Ptr<Node> n : curr_nodes ) {
+    while(pq.size()) {
+        std::cout << pq.size() << std::endl;
+        emp::Ptr<Node> n = pq.top();
+        pq.pop();
+        for (Axis & ax : all_axes) {
+            if (emp::Has(n->axes, ax)) {
+                continue;
+            }
+            // bool can_use = true;
+            if (!pop[ind][ax.curr_id]) {
+                // for (int j = 0; j < pop.size(); j++) {
+                //     if (pop[j][ax.curr_id] && std::all_of(n->axes.begin(), n->axes.end(), [j, &pop](const Axis & x){return pop[j][x.curr_id];})) {
+                //         can_use = false;
+                //         break;
+                //     }
+                // }
+                // Identify members of current set that have
+                // 1s for individual
+                // Try choosing all of those, then all of the others,
+                // then new axis. See if that actually works.
+                // if (can_use) {
+                emp::vector<Axis> ones;
+                emp::vector<Axis> zeros;
 
-                            for (Axis ax2 : n->axes) {
-                                if (pop[ind][ax2.curr_id]) {
-                                    ones.push_back(ax2);
-                                } else {
-                                    zeros.push_back(ax2);
-                                }
-                            }
-                            emp::vector<PHEN_T> test_pop = pop;
-                            for (Axis & ax2 : ones) {
-                                test_pop = FindHighest(test_pop, ax2.curr_id);
-                            }
-                            for (Axis & ax2 : zeros) {
-                                test_pop = FindHighest(test_pop, ax2.curr_id);
-                            }
-                            test_pop = FindHighest(test_pop, ax.curr_id);
-                            if (!emp::Has(test_pop, pop[ind])) {
-                                can_use = false;
-                            }
-                        }
-
-                    }
-
-                    if (can_use) {
-                        std::set<Axis> temp_set = n->axes;
-                        temp_set.insert(ax);
-                        if (!emp::Has(nodes, temp_set)) {
-                            nodes[temp_set] = Node(temp_set);
-                            next_nodes.push_back(&nodes[temp_set]);
-                            nodes[temp_set].free_axes = n->free_axes + ax.dups - 1;
-                        }
-                        emp::Ptr<Node> curr_node = &nodes[temp_set];
-                        n->children.insert(curr_node);
-                        // int max_val = std::max_element(n->seq_counts.begin(), n->seq_counts.end(), [](auto & p1, auto & p2){return p1.first < p2.first;})->first;
-                        for (int i = depth; i < depth + n->free_axes + ax.dups; i++) {
-                            // depth + 1 (dups options)
-                            // depth + 2 (dups * free axes) - free_axes is max_val - depth
-                            // curr_node->seq_counts[i] += n->seq_counts[i-1] * ax.dups;
-                            int avail = ax.dups - 1 + n->free_axes;
-                            for (int j = 1; j < i; j++){
-                                curr_node->seq_counts[i] += n->seq_counts[i-j] * ax.dups * FactorialDiff(avail, avail - j + 1); 
-                            }
-                        }
-                        // curr_node->free_axes += ax.dups - 1;
+                for (Axis ax2 : n->axes) {
+                    if (pop[ind][ax2.curr_id]) {
+                        ones.push_back(ax2);
+                    } else {
+                        zeros.push_back(ax2);
                     }
                 }
+                emp::vector<PHEN_T> test_pop = pop;
+                for (Axis & ax2 : ones) {
+                    test_pop = FindHighest(test_pop, ax2.curr_id);
+                }
+                for (Axis & ax2 : zeros) {
+                    test_pop = FindHighest(test_pop, ax2.curr_id);
+                }
+                test_pop = FindHighest(test_pop, ax.curr_id);
+                if (!emp::Has(test_pop, pop[ind])) {
+                    // can_use = false;
+                    continue;
+                }
+
             }
+
+
+            std::set<Axis> temp_set = n->axes;
+            temp_set.insert(ax);
+            temp_set.insert(ax.sub_axes.begin(), ax.sub_axes.end());
+
+            if (!emp::Has(nodes, temp_set)) {
+                nodes[temp_set] = Node(temp_set);
+                pq.push(&nodes[temp_set]);
+                nodes[temp_set].free_axes = n->free_axes + ax.dups + ax.bonus_dups - 1;
+            }
+            emp::Ptr<Node> curr_node = &nodes[temp_set];
+            n->children.insert(curr_node);
+            // int max_val = std::max_element(n->seq_counts.begin(), n->seq_counts.end(), [](auto & p1, auto & p2){return p1.first < p2.first;})->first;
+            int avail = ax.dups - 1 + ax.bonus_dups + n->free_axes;
+            for (int i = 1; i < n->axes.size() + avail; i++) {
+                // depth + 1 (dups options)
+                // depth + 2 (dups * free axes) - free_axes is max_val - depth
+                // curr_node->seq_counts[i] += n->seq_counts[i-1] * ax.dups;
+                
+                for (int j = 1; j < i; j++){
+                    curr_node->seq_counts[i] += n->seq_counts[i-j] * ax.dups * FactorialDiff(avail, avail - j + 1); 
+                }
+            }
+            // curr_node->free_axes += ax.dups - 1;
         }
-        curr_nodes = next_nodes;
-        next_nodes.clear();
-        if (curr_nodes.size() == 0) {
-            return 0;
-        }
+        // }
+        // for (emp::Ptr<Node> n : curr_nodes) {
+        //     nodes.erase(n->axes);
+        // }
+        // curr_nodes = next_nodes;
+        // next_nodes.clear();
     }
-    emp_assert(curr_nodes.size() == 1, curr_nodes.size());
-    return ((double)curr_nodes[0]->seq_counts[n_real_axes]/dup_solutions)/(double)SwitchFactorial(n_real_axes);
+    Node & answer = nodes[std::set(all_axes.begin(), all_axes.end())];
+    // emp_assert(curr_nodes.size() == 1, curr_nodes.size());
+    return ((double)answer.seq_counts[n_real_axes]/dup_solutions)/(double)SwitchFactorial(n_real_axes);
 }
 
 

@@ -19,12 +19,37 @@ def test_lex_prob():
                           (3, 10, 30),
                           (4, 20, 10),
                           (5, 20, 20),
-                          (6, 20, 30),
-                          (7, 30, 30)])
+                          (6, 3, 20),                          
+                          (7, 20, 3),                          
+                          (8, 8, 20),                          
+                          (9, 20, 8),                            
+                        #   (6, 20, 30),
+                        #   (7, 30, 30),
+                        #   (8, 40, 40)
+                          ])
 def test_benchmark_lex_prob(benchmark, seed, n, m):
     random.seed(seed)
     benchmark(eco.LexicaseFitness,
-              [[random.randint(0, 1) for i in range(n)] for j in range(m)])
+              [[random.randint(0, 1) for i in range(n)] for j in range(m)], 0, True)
+
+@pytest.mark.parametrize("seed, n, m",
+                         [(1, 10, 10),
+                          (2, 10, 20),
+                          (3, 10, 30),
+                          (4, 20, 10),
+                          (5, 20, 20),
+                          (6, 3, 20),                          
+                          (7, 20, 3),                          
+                          (8, 8, 20),                          
+                          (9, 20, 8),                          
+                        #   (6, 20, 30),
+                        #   (7, 30, 30),
+                        #   (8, 40, 40)
+                          ])
+def test_benchmark_binary_lex_prob(benchmark, seed, n, m):
+    random.seed(seed)
+    benchmark(eco.LexicaseFitnessIndividualBinary,
+              [[random.randint(0, 1) for i in range(n)] for j in range(m)], 0)
 
 
 def test_lex_prob_individual():

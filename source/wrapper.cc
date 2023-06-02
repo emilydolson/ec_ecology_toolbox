@@ -31,7 +31,7 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
             List of floats
               The probabilities of each individual in pop being selected by lexicase selection.            
             )mydelimiter",
-          py::arg("pop"), py::arg("epsilon") = 0.0);
+          py::arg("pop"), py::arg("epsilon") = 0.0, py::arg("binary") = false);
 
     m.def("LexicaseFitnessIndividual", &LexicaseFitnessIndividual<emp::vector<double>>, 
             R"mydelimiter(
@@ -55,6 +55,24 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
               The probability of individual i being selected by lexicase selection.
             )mydelimiter", 
           py::arg("pop"), py::arg("i"), py::arg("epsilon") = 0.0);
+
+        m.def("LexicaseFitnessIndividualBinary", &SolveBinary<emp::vector<double>>, 
+            R"mydelimiter(
+            Returns the probability that a single individual is selected by lexicase selection in the case where all scores are either 0 or 1.
+
+            Parameters
+            ----------
+            pop: list of lists of floats 
+              The scores of a population on each test case/fitness criterion.
+            i: int
+              The index of the individual in pop to calculate selection probability for
+            
+            Returns
+            -------
+            float
+              The probability of individual i being selected by lexicase selection.
+            )mydelimiter", 
+          py::arg("pop"), py::arg("i"));
 
     m.def("SharingFitness", &SharingFitness<emp::vector<double>>, 
             R"mydelimiter(
@@ -106,7 +124,12 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
     py::class_<emp::Random>(m, "Random")
       .def(py::init<int>());
 
+    py::class_<emp::BitVector>(m, "BitVector")
+      .def(py::init<std::string>());
+
     py::class_<emp::NKLandscape>(m, "NKLandscape")
       .def(py::init<size_t, size_t, emp::Random&>())
-      .def("GetFitness", static_cast<double (emp::NKLandscape::*)(size_t, size_t) const>(&emp::NKLandscape::GetFitness));
+      .def("GetFitness", static_cast<double (emp::NKLandscape::*)(size_t, size_t) const>(&emp::NKLandscape::GetFitness))
+      .def("GetFitnesses", static_cast<emp::vector<double> (emp::NKLandscape::*)(emp::BitVector) const>(&emp::NKLandscape::GetFitnesses))
+      ;
 }
