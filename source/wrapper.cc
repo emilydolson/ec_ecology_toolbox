@@ -31,7 +31,31 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
             List of floats
               The probabilities of each individual in pop being selected by lexicase selection.            
             )mydelimiter",
-          py::arg("pop"), py::arg("epsilon") = 0.0, py::arg("binary") = false);
+          py::arg("pop"), py::arg("epsilon") = 0.0);//, py::arg("binary") = false);
+    
+    m.def("UnoptimizedLexicaseFitness", &UnoptimizedLexicaseFitness<emp::vector<double>>, 
+            R"mydelimiter(
+            Return a vector containing the probability that each member of the population will be selected by lexicase selection or epsilon lexicase selection.
+            
+            For example, LexicaseFitness([[1, 2, 2], [2, 1, 2], [0, 0, 0]]) will return [.5, .5, 0], because the first two score vectors each have a 50% chance
+            of being chosen and the third has no chance of being chosen.
+
+            Note: calculating these probabilities is an NP-Hard problem (Dolson, 2023). This function is optimized, but if you try to use it with too large of input
+            it might take a very a long time.
+
+            Parameters
+            ----------
+            pop: list of lists of floats 
+              The scores of each member of the population population on each test case/fitness criterion.
+            epsilon: float
+              (optional) The epsilon value to use (if you want epsilon-lexicase selection probabilities; default value is 0, which is equivalent to standard lexicase selection).  
+
+            Returns
+            -------
+            List of floats
+              The probabilities of each individual in pop being selected by lexicase selection.            
+            )mydelimiter",
+          py::arg("pop"), py::arg("epsilon") = 0.0);//, py::arg("binary") = false);
 
     m.def("LexicaseFitnessIndividual", &LexicaseFitnessIndividual<emp::vector<double>>, 
             R"mydelimiter(
@@ -56,23 +80,23 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
             )mydelimiter", 
           py::arg("pop"), py::arg("i"), py::arg("epsilon") = 0.0);
 
-        m.def("LexicaseFitnessIndividualBinary", &SolveBinary<emp::vector<double>>, 
-            R"mydelimiter(
-            Returns the probability that a single individual is selected by lexicase selection in the case where all scores are either 0 or 1.
+        // m.def("LexicaseFitnessIndividualBinary", &SolveBinary<emp::vector<double>>, 
+        //     R"mydelimiter(
+        //     Returns the probability that a single individual is selected by lexicase selection in the case where all scores are either 0 or 1.
 
-            Parameters
-            ----------
-            pop: list of lists of floats 
-              The scores of a population on each test case/fitness criterion.
-            i: int
-              The index of the individual in pop to calculate selection probability for
+        //     Parameters
+        //     ----------
+        //     pop: list of lists of floats 
+        //       The scores of a population on each test case/fitness criterion.
+        //     i: int
+        //       The index of the individual in pop to calculate selection probability for
             
-            Returns
-            -------
-            float
-              The probability of individual i being selected by lexicase selection.
-            )mydelimiter", 
-          py::arg("pop"), py::arg("i"));
+        //     Returns
+        //     -------
+        //     float
+        //       The probability of individual i being selected by lexicase selection.
+        //     )mydelimiter", 
+        //   py::arg("pop"), py::arg("i"));
 
     m.def("SharingFitness", &SharingFitness<emp::vector<double>>, 
             R"mydelimiter(
