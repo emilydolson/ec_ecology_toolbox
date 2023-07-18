@@ -54,7 +54,7 @@ def test_benchmark_lex_prob(benchmark, seed, n, m):
 
 def test_lex_prob_individual():
     assert eco.LexicaseFitnessIndividual([[1, 2, 3]], 0, 1) == 1
-    assert eco.LexicaseFitnessIndividual([[1, 2, 3], [2, 1, 4]], 1, 1) == .5
+    assert eco.LexicaseFitnessIndividual([[1, 2, 3], [2, 1, 4]], 1, 1.1) == .5
     assert eco.LexicaseFitnessIndividual([[1, 2, 3], [2, 1, 4]], 0) == pytest.approx(.3333333333)
     assert eco.LexicaseFitnessIndividual([[1, 2, 3], [2, 1, 4]], 1) == pytest.approx(.6666666667)
 
