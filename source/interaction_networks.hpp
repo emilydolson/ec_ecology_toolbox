@@ -93,7 +93,7 @@ emp::vector<int> FindHighestIndices(emp::vector<PHEN_T> & pop, int axis, double 
             best = pop[i][axis];
             winners.resize(0);
             winners.push_back(i);
-        } else if (almost_equal(pop[i][axis], best, 10)) {
+        } else if (almost_equal(pop[i][axis], best, 5)) {
             winners.push_back(i);
         }
     }
@@ -101,7 +101,7 @@ emp::vector<int> FindHighestIndices(emp::vector<PHEN_T> & pop, int axis, double 
     if (epsilon) {
         winners.resize(0);
         for (size_t i = 0; i < pop.size(); i++) {
-            if (gt_almost_equal(pop[i][axis] + epsilon, best, 10)) {
+            if (pop[i][axis] + epsilon > best) {
                 winners.push_back(i);
             }
         }
@@ -114,7 +114,7 @@ bool IsElite(emp::vector<PHEN_T> & pop, int axis, PHEN_T individual, double epsi
     double best = individual[axis];
 
     for (size_t i = 0; i < pop.size(); i++) {
-        if (!lt_almost_equal(pop[i][axis], best + epsilon, 10)) {
+        if (pop[i][axis] > best + epsilon) {
             return false;
         }
     }
@@ -583,7 +583,7 @@ void TournamentHelper(emp::vector<double> & fit_map, int t_size = 2){
         double equal = 0.0; 
 
         for (auto & org2 : base_fit_map) {
-            if (almost_equal(org2, base_fit_map[i], 10)) {
+            if (almost_equal(org2, base_fit_map[i], 5)) {
                 equal++;
             } else if (org2 < base_fit_map[i]) {
                 less++;
@@ -739,7 +739,7 @@ emp::WeightedGraph CalcCompetition(emp::vector<PHEN_T> pop,
             // In terms of floating-point imprecision issues, it's much better
             // to check for equality than doing the subtraction and checking
             // for the result to be 0
-            if (!almost_equal(fitnesses[j], new_fits[j], 10)) {
+            if (!almost_equal(fitnesses[j], new_fits[j], 5)) {
                 effects.AddEdge(i, j, fitnesses[j] - new_fits[j]);
             }
             // std::cout << effect << std::endl;
