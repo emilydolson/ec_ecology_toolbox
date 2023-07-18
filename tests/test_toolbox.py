@@ -30,7 +30,7 @@ def test_lex_prob():
 def test_benchmark_lex_prob(benchmark, seed, n, m):
     random.seed(seed)
     benchmark(eco.LexicaseFitness,
-              [[random.randint(0, 1) for i in range(n)] for j in range(m)], 0, True)
+              [[random.randint(0, 1) for i in range(n)] for j in range(m)], 0)
 
 # @pytest.mark.parametrize("seed, n, m",
 #                          [(1, 10, 10),
