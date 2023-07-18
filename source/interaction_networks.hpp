@@ -93,7 +93,7 @@ emp::vector<int> FindHighestIndices(emp::vector<PHEN_T> & pop, int axis, double 
             best = pop[i][axis];
             winners.resize(0);
             winners.push_back(i);
-        } else if (almost_equal(pop[i][axis], best, 5)) {
+        } else if (almost_equal(pop[i][axis], best, 10)) {
             winners.push_back(i);
         }
     }
@@ -101,7 +101,7 @@ emp::vector<int> FindHighestIndices(emp::vector<PHEN_T> & pop, int axis, double 
     if (epsilon) {
         winners.resize(0);
         for (size_t i = 0; i < pop.size(); i++) {
-            if (gt_almost_equal(pop[i][axis] + epsilon, best, 5)) {
+            if (gt_almost_equal(pop[i][axis] + epsilon, best, 10)) {
                 winners.push_back(i);
             }
         }
@@ -114,7 +114,7 @@ bool IsElite(emp::vector<PHEN_T> & pop, int axis, PHEN_T individual, double epsi
     double best = individual[axis];
 
     for (size_t i = 0; i < pop.size(); i++) {
-        if (!lt_almost_equal(pop[i][axis], best + epsilon, 5)) {
+        if (!lt_almost_equal(pop[i][axis], best + epsilon, 10)) {
             return false;
         }
     }

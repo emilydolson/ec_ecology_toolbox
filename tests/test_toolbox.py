@@ -46,10 +46,10 @@ def test_benchmark_lex_prob(benchmark, seed, n, m):
                         #   (7, 30, 30),
                         #   (8, 40, 40)
                           ])
-def test_benchmark_binary_lex_prob(benchmark, seed, n, m):
-    random.seed(seed)
-    benchmark(eco.LexicaseFitnessIndividualBinary,
-              [[random.randint(0, 1) for i in range(n)] for j in range(m)], 0)
+# def test_benchmark_binary_lex_prob(benchmark, seed, n, m):
+#     random.seed(seed)
+#     benchmark(eco.LexicaseFitnessIndividualBinary,
+#               [[random.randint(0, 1) for i in range(n)] for j in range(m)], 0)
 
 
 def test_lex_prob_individual():
