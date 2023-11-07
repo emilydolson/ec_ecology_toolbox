@@ -4,8 +4,8 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-from custom_user_functions import custom_user_func_1, custom_user_func_2, custom_user_func_3, custom_user_func_4
-from example_nodes import Node
+# from custom_user_functions import custom_user_func_1, custom_user_func_2, custom_user_func_3, custom_user_func_4
+# from example_nodes import Node
 
 
 def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
