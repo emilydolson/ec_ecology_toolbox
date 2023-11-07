@@ -1,5 +1,5 @@
 import pytest
-from ec_ecology_toolbox.source.Project_CAG import community_assembly_graph
+from source.Project_CAG import community_assembly_graph
 
 
 def test_graph_output():

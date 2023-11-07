@@ -4,7 +4,7 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-from ec_ecology_toolbox.source.Project_CAG.custom_user_functions import custom_user_func_1, custom_user_func_2, custom_user_func_3, custom_user_func_4
+from source.Project_CAG.custom_user_functions import custom_user_func_1, custom_user_func_2, custom_user_func_3, custom_user_func_4
 # from example_nodes import Node
 
 
