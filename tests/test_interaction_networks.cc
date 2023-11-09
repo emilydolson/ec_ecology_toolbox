@@ -115,6 +115,41 @@ TEST_CASE("PruneAxes", "[helpers]") {
 
 }
 
+TEST_CASE("Epsilon", "[selection_schemes]") {
+    emp::vector<org_t> pop = emp::vector<org_t>({{0,0,0,0,0,0,0,0,0,1}, {0,0,0,0,1,0,0,0,0,1}, 
+                                                 {0,0,0,0,0,0,0,0,0,0},
+                                                 {0,0,0,0,2,0,0,0,0,1}, {0,0,0,0,1,0,0,0,1,1},
+                                                 {0,0,1,0,1,0,0,0,0,1}, {0,0,1,0,1,0,0,0,1,1}});
+    fit_map_t fits = LexicaseFitness(pop, 3);
+    CHECK(fits[0] == Approx(1.0/7.0));
+    CHECK(fits[1] == Approx(1.0/7.0));
+    CHECK(fits[2] == Approx(1.0/7.0));
+    CHECK(fits[3] == Approx(1.0/7.0));
+    CHECK(fits[4] == Approx(1.0/7.0));
+    CHECK(fits[5] == Approx(1.0/7.0));
+    CHECK(fits[6] == Approx(1.0/7.0));
+   
+    pop = emp::vector<org_t>({{-1,-1,-1,-1,-1,-1,-1,-1,-1, 1}, 
+                              {-2,-2,-2,-2, 0,-2,-2,-2,-2, 0}, 
+                              { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {-3,-3,-3,-3, 1,-3,-3,-3,-3,-1}, 
+                              {-3,-3,-3,-3,-2,-3,-3,-3,-2,-2},
+                              {-3,-3,-2,-3,-2,-3,-3,-3,-3,-2}, 
+                              {-4,-4,-3,-4,-3,-4,-4,-4,-3,-3}});
+
+    fits = LexicaseFitness(pop, 2.9);
+    fit_map_t unopt_fits = UnoptimizedLexicaseFitness(pop, 2.9);
+    CHECK(fits.size() == unopt_fits.size());
+    double total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        // CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 2.9)));
+    }
+    CHECK(total == Approx(1));
+
+}
+
 
 TEST_CASE("Lexicase", "[selection_schemes]") {
     emp::vector<org_t> pop({{3,0,0}, {0, 3, 0}, {0,0,3}});
