@@ -104,12 +104,13 @@ class Community:
     seen = {}
     queue = []
 
-    def __init__(self, members, priority, transitions_to=None):
+    def __init__(self, members, priority, source, transitions_to=None):
         self.id = Community.next_id
         Community.next_id += 1
         self.added_to_queue = False
         self.members = frozenset(members)
         self.edges = {}
+        self.in_priorities = {source: priority}
         self.priority = priority
         self.evaluated = False
         assert self.members not in Community.seen
@@ -147,11 +148,11 @@ class Community:
                     if frozenset(transitions_to) == self.members:
                         Community.seen[frozenset(transitions_to)] = self
                     else:
-                        Community.seen[frozenset(transitions_to)] = Community(transitions_to, priority, transitions_to)
+                        Community.seen[frozenset(transitions_to)] = Community(transitions_to, priority, self, transitions_to)
                     self.transitions_to = Community.seen[frozenset(transitions_to)]
                 for state in transient_states:
                     if state not in Community.seen and state != self.members:
-                        Community.seen[state] = Community(state, priority, transitions_to)
+                        Community.seen[state] = Community(state, priority, self, transitions_to)
         else:
             if frozenset(transitions_to) == self.members:
                 self.transitions_to = self
@@ -180,17 +181,18 @@ class Community:
     def __lt__(self, other):
         return len(self.members) < len(other.members)
 
-    def update_prob(self, prob, already_done=None):
+    def update_prob(self, prob, source, already_done=None):
         if already_done is None:
             already_done = set()
         already_done.add(self)
-        self.priority += prob
+        self.in_priorities[source] = prob
+        self.priority = sum(self.in_priorities.values())
         if not self.evaluated:
             heapq.heappush(Community.queue, (-1 * self.priority, self))            
         denom = sum(self.edges.values())
         for adj in self.edges:
             if adj not in already_done:
-                adj.update_prob(prob * self.edges[adj]/denom, already_done)
+                adj.update_prob(prob * self.edges[adj]/denom, self, already_done)
 
 for filename in glob.glob(sys.argv[1]):
     with open(filename) as infile:
@@ -226,7 +228,7 @@ print_phenotype_adjacency_list(phen_str_to_phen)
 curr_str = str([0]*100).replace(" ", "")
 print(phen_str_to_phen[curr_str])
 curr_phen = phen_str_to_phen[curr_str]
-comm = Community([curr_phen], 1)
+comm = Community([curr_phen], 1, None)
 
 count = 0
 # print(count, Community.queue)
@@ -263,11 +265,11 @@ while Community.queue and count < cut_off:
         if (new_members not in Community.seen):
             # print("not seen")
 
-            c = Community(new_members, curr.priority * adj[phen]/sum(adj.values()))
+            c = Community(new_members, curr.priority * adj[phen]/sum(adj.values()), curr)
         else:
             # print("seen")
             c = Community.seen[new_members]
-            c.update_prob(curr.priority * adj[phen]/sum(adj.values()))
+            c.update_prob(curr.priority * adj[phen]/sum(adj.values()), curr)
 
         if c in curr.edges:
             curr.edges[c] += adj[phen]/sum(adj.values())
