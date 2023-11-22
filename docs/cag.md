@@ -1,4 +1,4 @@
-## Community Assembly Graphs
+# Community Assembly Graphs
 
 Community assembly graphs are an ecological tool that can be repurposed to understand possible evolutionary trajectories for populations under selection schemes that create complex ecology.
 
