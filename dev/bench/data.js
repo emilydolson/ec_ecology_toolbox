@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699397448397,
+  "lastUpdate": 1700611999428,
   "repoUrl": "https://github.com/emilydolson/ec_ecology_toolbox",
   "entries": {
     "Python Benchmark with pytest-benchmark": [
@@ -17901,6 +17901,93 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00022543411456763562",
             "extra": "mean: 626.1940842559976 usec\nrounds: 1626"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "emilyldolson@gmail.com",
+            "name": "Emily Dolson",
+            "username": "emilydolson"
+          },
+          "committer": {
+            "email": "emilyldolson@gmail.com",
+            "name": "Emily Dolson",
+            "username": "emilydolson"
+          },
+          "distinct": true,
+          "id": "5af0d424760113c59df55d658e4973bb5fc63070",
+          "message": "Fix test imports",
+          "timestamp": "2023-11-21T19:12:04-05:00",
+          "tree_id": "0a8b2dc84d775000ccf8b1d7575f42004336049c",
+          "url": "https://github.com/emilydolson/ec_ecology_toolbox/commit/5af0d424760113c59df55d658e4973bb5fc63070"
+        },
+        "date": 1700611991498,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[1-10-10]",
+            "value": 6980.321407333828,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000022562887287936506",
+            "extra": "mean: 143.25987897195634 usec\nrounds: 4280"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[2-10-20]",
+            "value": 9146.075349371618,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000023338468613214368",
+            "extra": "mean: 109.33651449402339 usec\nrounds: 5485"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[3-10-30]",
+            "value": 167.8718194034014,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000963931654491233",
+            "extra": "mean: 5.956925966215734 msec\nrounds: 148"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[4-20-10]",
+            "value": 111.46035636101985,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00019222627597694986",
+            "extra": "mean: 8.971799773912458 msec\nrounds: 115"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[5-20-20]",
+            "value": 2.8307508866673357,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0055367303471878584",
+            "extra": "mean: 353.2631587999987 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[6-3-20]",
+            "value": 139403.33510309603,
+            "unit": "iter/sec",
+            "range": "stddev: 5.342243383095587e-7",
+            "extra": "mean: 7.173429525631133 usec\nrounds: 46861"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[7-20-3]",
+            "value": 118001.81512694914,
+            "unit": "iter/sec",
+            "range": "stddev: 6.441072000940728e-7",
+            "extra": "mean: 8.474445913600366 usec\nrounds: 39705"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[8-8-20]",
+            "value": 5687.631634993633,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00002373020909394786",
+            "extra": "mean: 175.82010653562998 usec\nrounds: 3764"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[9-20-8]",
+            "value": 3764.497694820789,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000008488253336915196",
+            "extra": "mean: 265.63968982523323 usec\nrounds: 2231"
           }
         ]
       }
