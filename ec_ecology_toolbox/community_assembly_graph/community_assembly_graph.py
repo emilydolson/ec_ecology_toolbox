@@ -1,12 +1,7 @@
-import copy
+from copy import deepcopy
 from queue import PriorityQueue
-import numpy as np
-import time
-import matplotlib.pyplot as plt
-
-from source.Project_CAG.custom_user_functions import custom_user_func_1, custom_user_func_2, custom_user_func_3, custom_user_func_4
-# from example_nodes import Node
-
+from numpy import dot
+from numpy.linalg import matrix_power
 
 def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
     # Function used to calculate probabilities of ending up at a node i.e. node passing pribability
@@ -48,7 +43,7 @@ def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
 
     # algorithm to calculate final passing probability
     # dot product of 'v' and the matrix raised to the power of the number of iterations
-    rw_probs = np.dot(v, np.linalg.matrix_power(matrix, num_iterations))
+    rw_probs = dot(v, matrix_power(matrix, num_iterations))
 
     return rw_probs, node_dir
 
@@ -200,7 +195,7 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
             # if not, add a self edge to ensure sum equals to 1
             # given condition, sum of edge weights will never exceed 1
             if edge_weight_sum < 1:
-                normalized_edges = copy.deepcopy(edges)
+                normalized_edges = deepcopy(edges)
                 normalized_edges[curr_node] = round(1 - edge_weight_sum, 4)
                 normalized_explored_graph[curr_node] = normalized_edges
             else:
@@ -239,13 +234,13 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
     return explored_graph
 
 
-if __name__ == '__main__':
-    start_time = time.time()
-    graph = CAG(1, custom_user_func_3, 20, False, 250)
-    end_time = time.time()
+# if __name__ == '__main__':
+#     start_time = time.time()
+#     graph = CAG(1, custom_user_func_3, 20, False, 250)
+#     end_time = time.time()
 
-    print(graph)
-    print("Run Time:", end_time - start_time)
+#     print(graph)
+#     print("Run Time:", end_time - start_time)
 
     # # Prints the explored  graph
     # G = nx.DiGraph(final)

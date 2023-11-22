@@ -6,7 +6,7 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
-PYBIND11_MODULE(ec_ecology_toolbox, m) {
+PYBIND11_MODULE(selection_probabilities, m) {
     m.doc() = "Tools for measuring the ecology of various evolutionary algorithms"; 
 
     m.def("LexicaseFitness", &LexicaseFitness<emp::vector<double>>, 
