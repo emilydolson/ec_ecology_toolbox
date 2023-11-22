@@ -1,4 +1,4 @@
-import ec_ecology_toolbox as eco
+import ec_ecology_toolbox.selection_probabilities as eco
 import random
 import pytest
 
