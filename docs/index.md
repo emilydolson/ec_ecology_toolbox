@@ -1,12 +1,12 @@
 # Introduction to EC Ecology Toolbox
 
+This library contains a collection of tools to assist with ecology-inspired analysis of evoluationary algorithms.
+
+## Contents
 
 ```{toctree}
-```
+:maxdepth: 1
 
-```{eval-rst}
-.. automodule:: ec_ecology_toolbox
-    :special-members: __init__
-    :members:
-    :undoc-members:
-```
+selection.md
+cag.md
+``` 
