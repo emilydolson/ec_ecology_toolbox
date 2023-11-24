@@ -10,4 +10,4 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 test-command = "python {project}/tests/test_toolbox.py"
 skip = ["*musllinux*", "*-win32*", "cp37*", "pp37*"]
-test-requires = ["pytest", "oldest-supported-numpy"]
+test-requires = ["pytest", "numpy"]
