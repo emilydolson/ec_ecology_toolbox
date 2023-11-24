@@ -2,7 +2,8 @@
 requires = [
     "setuptools>=42",
     "wheel",
-    "pybind11>=2.8.0"
+    "pybind11>=2.8.0",
+    "numpy"
 ]
 
 build-backend = "setuptools.build_meta"
@@ -10,4 +11,4 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 test-command = "python {project}/tests/test_toolbox.py"
 skip = ["*musllinux*", "*-win32*"]
-test-requires = "pytest numpy"
+test-requires = "pytest"
