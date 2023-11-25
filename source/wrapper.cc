@@ -6,6 +6,16 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
+PYBIND11_DECLARE_HOLDER_TYPE(T, emp::Ptr<T>, true);
+
+// Only needed if the type's `.get()` goes by another name
+namespace pybind11 { namespace detail {
+    template <typename T>
+    struct holder_helper<emp::Ptr<T>> { // <-- specialization
+        static const T *get(const emp::Ptr<T> &p) { return p.Raw(); }
+    };
+}}
+
 PYBIND11_MODULE(selection_probabilities, m) {
     m.doc() = "Tools for measuring the ecology of various evolutionary algorithms"; 
 
