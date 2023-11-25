@@ -145,8 +145,8 @@ PYBIND11_MODULE(selection_probabilities, m) {
             )mydelimiter",
           py::arg("pop"), py::arg("t_size") = 2);
 
-    // py::class_<emp::Random>(m, "Random")
-    //   .def(py::init<int>());
+    py::class_<emp::Random>(m, "Random")
+      .def(py::init<int>());
 
     // py::class_<emp::BitVector>(m, "BitVector")
     //   .def(py::init<std::string>());
