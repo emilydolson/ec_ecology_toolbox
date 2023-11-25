@@ -27,6 +27,7 @@ def test_lex_prob():
                         #   (7, 30, 30),
                         #   (8, 40, 40)
                           ])
+@pytest.mark.bench
 def test_benchmark_lex_prob(benchmark, seed, n, m):
     random.seed(seed)
     benchmark(eco.LexicaseFitness,
