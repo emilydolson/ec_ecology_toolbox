@@ -145,15 +145,15 @@ PYBIND11_MODULE(selection_probabilities, m) {
             )mydelimiter",
           py::arg("pop"), py::arg("t_size") = 2);
 
-    py::class_<emp::Random>(m, "Random")
-      .def(py::init<int>());
+    // py::class_<emp::Random>(m, "Random")
+    //   .def(py::init<int>());
 
-    py::class_<emp::BitVector>(m, "BitVector")
-      .def(py::init<std::string>());
+    // py::class_<emp::BitVector>(m, "BitVector")
+    //   .def(py::init<std::string>());
 
-    py::class_<emp::NKLandscape>(m, "NKLandscape")
-      .def(py::init<size_t, size_t, emp::Random&>())
-      .def("GetFitness", static_cast<double (emp::NKLandscape::*)(size_t, size_t) const>(&emp::NKLandscape::GetFitness))
-      .def("GetFitnesses", static_cast<emp::vector<double> (emp::NKLandscape::*)(emp::BitVector) const>(&emp::NKLandscape::GetFitnesses))
+    // py::class_<emp::NKLandscape>(m, "NKLandscape")
+    //   .def(py::init<size_t, size_t, emp::Random&>())
+    //   .def("GetFitness", static_cast<double (emp::NKLandscape::*)(size_t, size_t) const>(&emp::NKLandscape::GetFitness))
+    //   .def("GetFitnesses", static_cast<emp::vector<double> (emp::NKLandscape::*)(emp::BitVector) const>(&emp::NKLandscape::GetFitnesses))
       ;
 }
