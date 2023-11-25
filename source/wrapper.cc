@@ -1,6 +1,6 @@
 
 #include "interaction_networks.hpp"
-#include "Evolve/NK.hpp"
+// #include "Evolve/NK.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
