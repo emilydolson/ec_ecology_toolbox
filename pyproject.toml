@@ -13,5 +13,5 @@ skip = ["*musllinux*", "cp37*", "pp37*"]
 
 [tool.pytest.ini_options]
 markers = [
-    "bench"
+    "bench", "exclude"
 ]
