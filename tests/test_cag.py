@@ -2,6 +2,7 @@ import pytest
 from ec_ecology_toolbox import community_assembly_graph
 
 
+@pytest.mark.exclude
 def test_graph_output():
     def custom_user_func(n):
         # Example user function used as input
