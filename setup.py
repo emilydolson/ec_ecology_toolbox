@@ -18,7 +18,9 @@ ext_modules = [
     Pybind11Extension("ec_ecology_toolbox.selection_probabilities",
                       ["source/wrapper.cc"],
                       include_dirs=['third-party/Empirical/include/emp'],
-                      cxx_std=20
+                      cxx_std=20  # ,
+                    #   define_macros=[('_DEBUG', 1), ('DEBUG', 1), ('NDEBUG', 0)],
+                    #   extra_compile_args=["-g", "-O0"]
                       ),
 ]
 
