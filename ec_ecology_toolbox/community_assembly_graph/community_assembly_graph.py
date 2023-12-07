@@ -3,20 +3,21 @@ from queue import PriorityQueue
 from numpy import dot
 from numpy.linalg import matrix_power
 
-def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
-    # Function used to calculate probabilities of ending up at a node i.e. node passing pribability
-    # Implements iterative random walk theory using matrix multiplication
-    # Refer: https://chih-ling-hsu.github.io/2020/05/20/random-walks
 
+def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
     """
+    Function used to calculate probabilities of ending up at a node i.e. node passing probability
+    Implements iterative random walk theory using matrix multiplication
+    Refer: https://chih-ling-hsu.github.io/2020/05/20/random-walks
+
     :param graph: manipulated graph with sink nodes on which the random walk algorithm is run
-    :type graph: dict
+    :type graph: dict {Node: dict {Node: float}}
     :param start_node: the start node of the random walk
-    :type start_node: user defined class
+    :type start_node: user-defined Node class
     :param num_iterations: number of iterations to run for the random walk. default: 100
     :type num_iterations: int
     :return: tuple including final passing probabilities after convergence and the node directory for index matching
-    :rtype: tuple
+    :rtype: tuple (list [float], dict {Node: int})
     """
 
     # A directory for tracking the index position in the matrix for each node
@@ -39,6 +40,7 @@ def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
             row[pos] = weight
 
         # Adding the row to matrix into it's correct index position
+        # noinspection PyTypeChecker
         matrix[node_dir[node]] = row
 
     # algorithm to calculate final passing probability
@@ -49,22 +51,22 @@ def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
 
 
 def update_priorities(graph, leaves, start_node, node_passing_p, num_iterations):
-    # Updates the probabilities of the discovered nodes in the priority queue
-    # Called when new paths to visited nodes or cycles are discovered in the explored graph
-
     """
+    Updates the probabilities of the discovered nodes in the priority queue
+    Called when new paths to visited nodes or cycles are discovered in the explored graph
+
     :param graph: explored graph with all visited nodes and discovered paths
-    :type graph: dict
+    :type graph: dict {Node: dict {Node: float}}
     :param leaves: all leaf nodes that have been discovered and are in the priority queue
-    :type leaves: set
+    :type leaves: set {Node}
     :param start_node: the starting node of exploration
-    :type start_node: user_defined class
+    :type start_node: user-defined Node class
     :param node_passing_p: holds the updated passing probability of all discovered nodes
-    :type node_passing_p: dict
+    :type node_passing_p: dict {Node: float}
     :param num_iterations: number of iterations to run for the random walk. default: 100
     :type num_iterations: int
     :return: new priority queue with updated probabilities of all leaf nodes
-    :rtype: queue.PriorityQueue
+    :rtype: queue.PriorityQueue -> tuple (float, Node)
     """
     # New priority queue to hold nodes with updated priorities
     new_pq = PriorityQueue()
@@ -90,10 +92,12 @@ def update_priorities(graph, leaves, start_node, node_passing_p, num_iterations)
 
 
 def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_iterations=100):
-    # Main function that is used to explore the graph based on user function and start node
-    # Graph is explored based on continuous probability of reaching a node signified by edge weights
-
     """
+    Main function that is used to explore the graph based on user function and start node
+    Graph is explored based on continuous probability of reaching a node signified by edge weights
+    Probability of reaching a node calculated from user given start node
+    User defines the bumber of nodes to be discoered and returned
+
     :param start_node: starting node of exploration
     :type start_node: user-defined Node class
     :param user_func: user defined function the returns all outgoing edges with weights from input node
@@ -105,7 +109,7 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
     :param num_iterations: number of iterations to run for random walk. default: 100
     :type num_iterations: int
     :return: explored graph until required number of nodes reached or full graph is explored
-    :rtype: dict
+    :rtype: dict {Node: dict {Node: float}}
     """
 
     # priority queue that holds the discovered nodes based on the probability of reaching it
@@ -179,11 +183,6 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
         # which returns all outgoing edges from the nodes with edge weights
         edges = user_func(curr_node)
 
-        if curr_node in edges:
-            # removing all self_edges. necessary for the update_priorities algorithm
-            # will be added back if normalize_w_edges is set to True
-            del edges[curr_node]
-
         # updated the explored graph dict with newly explored edges
         explored_graph[curr_node] = edges
 
@@ -234,18 +233,28 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
     return explored_graph
 
 
-# if __name__ == '__main__':
-#     start_time = time.time()
-#     graph = CAG(1, custom_user_func_3, 20, False, 250)
-#     end_time = time.time()
+if __name__ == '__main__':
+    import time
+    from ec_ecology_toolbox.community_assembly_graph.custom_user_functions import custom_user_func_3
+    from ec_ecology_toolbox.community_assembly_graph.benchmarking.benchmarking import benchmarking_func2
+    from ec_ecology_toolbox.community_assembly_graph.example_nodes import Chr_Node
 
-#     print(graph)
-#     print("Run Time:", end_time - start_time)
+    start_time = time.time()
+    N = Chr_Node(1)
+    graph = CAG(N, custom_user_func_3, 20, False, 250)
+    end_time = time.time()
 
-    # # Prints the explored  graph
-    # G = nx.DiGraph(final)
-    # nx.draw(G, with_labels=True, node_size=500, node_color='skyblue', font_size=10, font_color='black',
-    #         font_weight='bold')
-    # plt.show()
+    print(graph)
+    print("Run Time:", end_time - start_time)
+
+    start_time = time.time()
+    N = Chr_Node(1)
+    graph = CAG(N, benchmarking_func2, 5, False, 250)
+    end_time = time.time()
+
+    print(graph)
+    print("Run Time:", end_time - start_time)
+
+
 
 
