@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1702210578834,
+  "lastUpdate": 1702265949876,
   "repoUrl": "https://github.com/emilydolson/ec_ecology_toolbox",
   "entries": {
     "Python Benchmark with pytest-benchmark": [
@@ -52092,6 +52092,93 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000013351471122774617",
             "extra": "mean: 257.41302921457907 usec\nrounds: 2533"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "emilyldolson@gmail.com",
+            "name": "Emily Dolson",
+            "username": "emilydolson"
+          },
+          "committer": {
+            "email": "emilyldolson@gmail.com",
+            "name": "Emily Dolson",
+            "username": "emilydolson"
+          },
+          "distinct": true,
+          "id": "5c8126b2c371f2b0452a5338ea23ae6ca73e9aae",
+          "message": "Merge branch 'community-assembly-graph' of github.com:emilydolson/ec_ecology_toolbox into community-assembly-graph",
+          "timestamp": "2023-12-10T22:38:02-05:00",
+          "tree_id": "749a4c0afa5c172b8f97219e056ef41cceb32756",
+          "url": "https://github.com/emilydolson/ec_ecology_toolbox/commit/5c8126b2c371f2b0452a5338ea23ae6ca73e9aae"
+        },
+        "date": 1702265940753,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[1-10-10]",
+            "value": 6987.986642197664,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000011830890290498967",
+            "extra": "mean: 143.1027349081349 usec\nrounds: 4191"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[2-10-20]",
+            "value": 9064.047267748632,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000040951200842870506",
+            "extra": "mean: 110.32599129951188 usec\nrounds: 5402"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[3-10-30]",
+            "value": 163.52503925834606,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00003808989575920851",
+            "extra": "mean: 6.115271425926055 msec\nrounds: 162"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[4-20-10]",
+            "value": 110.53931644937809,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00006181073594870971",
+            "extra": "mean: 9.046554946428984 msec\nrounds: 112"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[5-20-20]",
+            "value": 2.8222923700733067,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000545822726478113",
+            "extra": "mean: 354.3219017999988 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[6-3-20]",
+            "value": 143173.0350931068,
+            "unit": "iter/sec",
+            "range": "stddev: 5.122738052292232e-7",
+            "extra": "mean: 6.984555432171222 usec\nrounds: 40509"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[7-20-3]",
+            "value": 120630.96453652212,
+            "unit": "iter/sec",
+            "range": "stddev: 5.687061261198072e-7",
+            "extra": "mean: 8.28974553790657 usec\nrounds: 35970"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[8-8-20]",
+            "value": 5632.892410391806,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000007551156561573702",
+            "extra": "mean: 177.52868813101352 usec\nrounds: 3665"
+          },
+          {
+            "name": "tests/test_toolbox.py::test_benchmark_lex_prob[9-20-8]",
+            "value": 3650.381361479831,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000007752424630081168",
+            "extra": "mean: 273.9439803611668 usec\nrounds: 2546"
           }
         ]
       }
