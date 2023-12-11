@@ -76,7 +76,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
-          CIBW_TEST_REQUIRES_WINDOWS: oldest-supported-numpy==2022.11.19 pytest==7.0.1
+          CIBW_TEST_REQUIRES_WINDOWS: oldest-supported-numpy==2023.10.25 pytest==7.0.1
           CIBW_TEST_REQUIRES_MACOS: numpy pytest
           CIBW_TEST_REQUIRES_LINUX: numpy pytest 
           CIBW_TEST_COMMAND: python -m pytest --import-mode=importlib -m "not bench and not exclude" {project}/tests
