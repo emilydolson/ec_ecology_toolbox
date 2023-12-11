@@ -4,7 +4,7 @@ from numpy import dot
 from numpy.linalg import matrix_power
 
 
-def random_walk_matrix_multiplication(graph, start_node, num_iterations=100):
+def random_walk_matrix_multiplication(graph, start_node, num_iterations):
     """
     Function used to calculate probabilities of ending up at a node i.e. node passing probability
     Implements iterative random walk theory using matrix multiplication
@@ -91,7 +91,7 @@ def update_priorities(graph, leaves, start_node, node_passing_p, num_iterations)
     return new_pq
 
 
-def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_iterations=100):
+def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_iterations=1500):
     """
     Main function that is used to explore the graph based on user function and start node
     Graph is explored based on continuous probability of reaching a node signified by edge weights
@@ -235,25 +235,25 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
 
 if __name__ == '__main__':
     import time
-    from ec_ecology_toolbox.community_assembly_graph.custom_user_functions import custom_user_func_3
+    from ec_ecology_toolbox.community_assembly_graph.custom_user_functions import custom_user_func_4
     from ec_ecology_toolbox.community_assembly_graph.benchmarking.benchmarking import benchmarking_func2
     from ec_ecology_toolbox.community_assembly_graph.example_nodes import Chr_Node
 
     start_time = time.time()
     N = Chr_Node(1)
-    graph = CAG(N, custom_user_func_3, 20, False, 250)
+    graph = CAG(N, custom_user_func_4, 10, False, 25000)
     end_time = time.time()
 
     print(graph)
     print("Run Time:", end_time - start_time)
 
-    start_time = time.time()
-    N = Chr_Node(1)
-    graph = CAG(N, benchmarking_func2, 5, False, 250)
-    end_time = time.time()
-
-    print(graph)
-    print("Run Time:", end_time - start_time)
+    # start_time = time.time()
+    # N = Chr_Node(1)
+    # graph = CAG(N, benchmarking_func2, 5, False, 250)
+    # end_time = time.time()
+    #
+    # print(graph)
+    # print("Run Time:", end_time - start_time)
 
 
 
