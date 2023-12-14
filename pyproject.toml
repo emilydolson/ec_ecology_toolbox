@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 test-command = "python {project}/tests/test_toolbox.py"
-skip = ["*musllinux*", "pp310-win*"]
+skip = ["*musllinux*", "cp37*", "pp37*", "pp310-win*"]
 
 [tool.pytest.ini_options]
 markers = [
