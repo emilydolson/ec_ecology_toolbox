@@ -714,40 +714,40 @@ template <typename PHEN_T>
 std::function<emp::vector<double>(emp::vector<PHEN_T>&)> do_random = [](emp::vector<PHEN_T> & pop){return RandomFitness(pop);};
 
 
-// template <typename PHEN_T>
-// emp::WeightedGraph CalcCompetition(emp::vector<PHEN_T> pop, 
-//                         std::function<emp::vector<double>(emp::vector<PHEN_T>&)> fit_fun) {
+template <typename PHEN_T>
+emp::WeightedGraph CalcCompetition(emp::vector<PHEN_T> pop, 
+                        std::function<emp::vector<double>(emp::vector<PHEN_T>&)> fit_fun) {
 
-//     emp::WeightedGraph effects(pop.size());
+    emp::WeightedGraph effects(pop.size());
 
 
-//     emp::vector<double> fitnesses = fit_fun(pop);
+    emp::vector<double> fitnesses = fit_fun(pop);
 
-//     for (size_t i = 0; i < pop.size(); i++) {
-//         effects.SetLabel(i, emp::to_string(pop[i]));
-//         // std::cout << effects.GetLabel(i) << std::endl;
+    for (size_t i = 0; i < pop.size(); i++) {
+        effects.SetLabel(i, emp::to_string(pop[i]));
+        // std::cout << effects.GetLabel(i) << std::endl;
 
-//         emp::vector<PHEN_T> curr = pop;
-//         for (size_t ax = 0; ax < curr[i].size(); ax++) {
-//             curr[i][ax] = 0; // Replace org with null org so pop size stays same
-//         }
+        emp::vector<PHEN_T> curr = pop;
+        for (size_t ax = 0; ax < curr[i].size(); ax++) {
+            curr[i][ax] = 0; // Replace org with null org so pop size stays same
+        }
 
-//         emp::vector<double> new_fits = fit_fun(curr);
-//         for (size_t j = 0; j < pop.size(); j++ ) {
-//             if (i == j) {continue;}
+        emp::vector<double> new_fits = fit_fun(curr);
+        for (size_t j = 0; j < pop.size(); j++ ) {
+            if (i == j) {continue;}
 
-//             // In terms of floating-point imprecision issues, it's much better
-//             // to check for equality than doing the subtraction and checking
-//             // for the result to be 0
-//             if (!almost_equal(fitnesses[j], new_fits[j], 5)) {
-//                 effects.AddEdge(i, j, fitnesses[j] - new_fits[j]);
-//             }
-//             // std::cout << effect << std::endl;
-//         }
-//     }
+            // In terms of floating-point imprecision issues, it's much better
+            // to check for equality than doing the subtraction and checking
+            // for the result to be 0
+            if (!almost_equal(fitnesses[j], new_fits[j], 5)) {
+                effects.AddEdge(i, j, fitnesses[j] - new_fits[j]);
+            }
+            // std::cout << effect << std::endl;
+        }
+    }
 
-//     return effects;
-// }
+    return effects;
+}
 
 
 #endif
