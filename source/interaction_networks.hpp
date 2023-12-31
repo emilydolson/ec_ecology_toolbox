@@ -14,7 +14,7 @@
 #include "datastructs/set_utils.hpp"
 #include "math/math.hpp"
 #include "math/distances.hpp"
-// #include "datastructs/Graph.hpp"
+#include "datastructs/Graph.hpp"
 // #include "Evolve/Resource.hpp"
 
 #include <math.h>  
