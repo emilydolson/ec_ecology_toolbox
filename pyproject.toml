@@ -12,6 +12,8 @@ test-command = "python {project}/tests/test_toolbox.py"
 skip = ["*musllinux*", "cp37*", "pp37*", "pp310-win*"]
 before-all = "g++ --version"
 
+manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64"
+
 [tool.pytest.ini_options]
 markers = [
     "bench", "exclude"
