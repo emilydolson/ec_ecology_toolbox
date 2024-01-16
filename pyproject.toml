@@ -10,6 +10,7 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 test-command = "python {project}/tests/test_toolbox.py"
 skip = ["*musllinux*", "cp37*", "pp37*", "pp310-win*"]
+before-all = "g++ --version"
 
 [tool.pytest.ini_options]
 markers = [
