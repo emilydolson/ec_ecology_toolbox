@@ -116,6 +116,9 @@ TEST_CASE("PruneAxes", "[helpers]") {
 }
 
 TEST_CASE("Epsilon", "[selection_schemes]") {
+    emp::Random r;
+    r.ResetSeed(2);
+
     emp::vector<org_t> pop = emp::vector<org_t>({{0,0,0,0,0,0,0,0,0,1}, {0,0,0,0,1,0,0,0,0,1}, 
                                                  {0,0,0,0,0,0,0,0,0,0},
                                                  {0,0,0,0,2,0,0,0,0,1}, {0,0,0,0,1,0,0,0,1,1},
@@ -139,13 +142,94 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
 
     fits = LexicaseFitness(pop, 2.9);
     fit_map_t unopt_fits = UnoptimizedLexicaseFitness(pop, 2.9);
-    std::cout << emp::to_string(fits) << " " << emp::to_string(unopt_fits) << std::endl;
+    // std::cout << emp::to_string(fits) << " " << emp::to_string(unopt_fits) << std::endl;
     CHECK(fits.size() == unopt_fits.size());
     double total = 0;
     for (size_t i = 0; i<fits.size(); i++) {
         total += fits[i];
         CHECK(fits[i] == Approx(unopt_fits[i]));
         CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 2.9)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(10);
+
+    for (int org = 0; org < 10; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 10; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 3);
+    unopt_fits = UnoptimizedLexicaseFitness(pop, 3);
+    CHECK(fits.size() == unopt_fits.size());
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 3)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(10);
+
+    for (int org = 0; org < 10; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 10; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 2);
+    unopt_fits = UnoptimizedLexicaseFitness(pop, 2);
+    CHECK(fits.size() == unopt_fits.size());
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 2)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(10);
+
+    for (int org = 0; org < 10; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 10; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 1);
+    unopt_fits = UnoptimizedLexicaseFitness(pop, 1);
+    CHECK(fits.size() == unopt_fits.size());
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 1)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(40);
+
+    for (int org = 0; org < 40; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 40; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 3);
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+
     }
     CHECK(total == Approx(1));
 
