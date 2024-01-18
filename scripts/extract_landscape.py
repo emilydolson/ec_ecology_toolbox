@@ -16,25 +16,36 @@ cut_off = int(sys.argv[2])
 file_root = sys.argv[1].replace("/", "_").replace("*","") + "_cutoff_" + str(cut_off)
 
 def print_phenotype_adjacency_list(map):
-    with open(file_root + "phen_adjaceny.csv", "w") as outfile:
-        for el in map:
-            denom = sum(map[el].full_adj.values())
-            for a in map[el].full_adj:
-                outfile.write(",".join([str(i) for i in [map[el].id, a.id, map[el].full_adj[a]/denom]]) + "\n")
+    outfile = open(file_root + "phen_adjaceny.csv", "w")
+    node_file = open(file_root + "phen_info.csv", "w")
+    outfile.write("from, to, weight\n")
+    node_file.write("id, phenotype, neutrality\n")
+    for el in map:
+        denom = sum(map[el].full_adj.values())
+        if denom != 0:
+            neut = map[el].full_adj[el]/denom
+        else:
+            neut = map[el].full_adj[el]
+        id = map[el].id
+        node_file.write(",".join([str(id), str(el), str(neut)])+"\n")
 
+        for a in map[el].full_adj:
+            outfile.write(",".join([str(i) for i in [map[el].id, a.id, map[el].full_adj[a]/denom]]) + "\n")
+    outfile.close()
+    node_file.close()
 
 def print_community_adjacency_list(map):
     edgefile = open(file_root + "comm_edges.csv", "w")
     nodefile = open(file_root + "comm_nodes.csv", "w")
     edgefile.write("From, To, Weight\n")
-    nodefile.write("id, members, evaluated, actual_sink\n")
+    nodefile.write("id, members, n_members, evaluated, actual_sink\n")
     for el in map:
         if not map[el].stable:
             continue
         members = str([i.id for i in map[el].members]).replace(",", " ")
         mem1 = str(map[el].id)
         actual_sink = map[el].evaluated and sum(map[el].edges.values()) == 0
-        nodefile.write(",".join([mem1, members, str(int(map[el].evaluated)), str(actual_sink)]) + "\n")
+        nodefile.write(",".join([mem1, members, str(len(map[el].members)), str(int(map[el].evaluated)), str(actual_sink)]) + "\n")
         denom = sum(map[el].edges.values())
         # print()
         # print(mem1, map[el].edges)
@@ -50,6 +61,8 @@ def print_community_adjacency_list(map):
             edgefile.write(",".join([str(i) for i in [mem1, mem2, edge_count/denom]]) + "\n")
         # if mem1 == "0":
         #     exit()
+    edgefile.close()
+    nodefile.close()
 
 class Phenotype:
     next_id = 0
@@ -189,7 +202,7 @@ for filename in glob.glob(sys.argv[1]):
         scores_col = header.index("training_case_scores")
 
         for line in reader:
-            # if count > 1000000:
+            # if count > 100:
             #     break
             # count += 1
             phen_str = line[scores_col]

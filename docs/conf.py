@@ -18,7 +18,7 @@ copyright = '2023, Emily Dolson'
 author = 'Emily Dolson'
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.6"
+release = "0.0.8"
 
 
 # -- General configuration ---------------------------------------------------

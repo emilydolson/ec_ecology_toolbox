@@ -3,7 +3,7 @@ PROJECT := evo_comp_ecology
 EMP_DIR := third-party/Empirical/include/emp
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/ -Ithird-party/discreture/include/Discreture
+CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/
 
 # Native compiler information
 CXX := clang++
@@ -30,6 +30,9 @@ test: tests/test_interaction_networks.cc
 test-cag: tests/test_cag.cpp
 	$(CXX_nat) $(CFLAGS_nat_debug) tests/test_cag.cpp -o test-cag
 	time ./test-cag
+
+coverage: 
+	$(CXX_nat) -shared $(shell python3 -m pybind11 --includes)/ $(CFLAGS_all)  -DNDEBUG -fprofile-arcs -ftest-coverage --coveragesource/wrapper.cc -o lexicase$(shell python3-config --extension-suffix)
 
 
 profile: tests/test_interaction_networks.cc
