@@ -377,21 +377,50 @@ double TraverseDecisionTreeIndividual(emp::vector<PHEN_T> & pop, emp::vector<int
     return plex;
 }
 
+
+/* Rationale: perm_levels holds the numbers that should get multiplied together to form the divisor. Multiplier holds product of numbers
+*  that should get multiplied together to form the numerator.
+*  In the simplest case, the numerators are all 1 and the divisors are N, N-1, N-2, ... 1, resulting in each branch of the recursion tree
+*  contributing 1/(N!) to the fitness of each org.
+*  When some fitness criteria (i.e. axes) become irrelevant along a branch of the recursion tree, the next fitness criterion that we pick
+*  is effectively being selected from among a smaller pool of candidates (because it no longer matters when we pick the irrelevant one).
+*  Consequently, we drop it from the denominator. Similarly, when we reach a stopping condition early, it means all remaining fitness 
+*  criteria are irrelevant, so we never add them to the denominator.
+*
+*  For example, consider that we have axes 0, 1, 2, and 3, and 4. Assume that 1 is more selective than 2 and 3, so that picking 2 or 3 after 1 
+*  has no effect. If we calculated brute force recursion tree, each leaf would represent 1/(5!) = 1/120 of the total fitness to be alloted.
+*  However, if we're optimizing, let's consider the case where we have selected 0 and then 1. There was a (1/5) chance of choosing 0
+*  and a (1/4) chance of choosing 1, so this part of the tree will represent 1/(5*4) = 1/20 of the total fitness to be alloted.
+*  Since we've chosen 1, which renders 2 and 3 irrelevant, we can stop here - all solutions in contention get an equal proportion of the 
+*  1/20 chance of being selected.
+*  If we had chosen 1 first (a 1/5 probability), the next axis we would actually look at would be 0 or 4. The outcomes of either of those
+*  choices would have a 1/(5*2) = 1/10 probability. 
+*
+*  The multiplier comes into effect when we have duplicate axes. We can save a lot of time by treating groups of identical axes as a single
+*  axis. Doing this will give us numbers other than 1 the numerator. For example, if we have axes 0, 1, 2, 3, and 4 and 2, 3, and 4 
+*  are identical, then we have a 3/5 chance of picking a member of the group as a first axis.
+*  If we pick something else first, then we will have a 3/4 chance of picking a member of the group as a second axis.
+*
+*/
 template <typename PHEN_T>
 void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, std::map<int,int> dups, double epsilon = 0, double multiplier = 1.0) {
-    // std::cout << "begining round of recursion " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << std::endl;
+    // std::cout << std::endl << std::endl << "begining round of recursion " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << " " << multiplier << " " << emp::to_string(perm_levels) << std::endl;
+
 
     // std::cout << emp::to_string(pop) << emp::to_string(axes) << std::endl;
  
     emp_assert(pop.size() > 0, axes, perm_levels);
     emp_assert(axes.size() > 0, axes, perm_levels);
 
-    // There's only one fitness criterion left, so it wins
+    // There's only one fitness criterion left - everything left ties
     if (axes.size() == 1) {
         emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
-        // std::cout << "Winners: " << emp::to_string(winners) << std::endl;
+        // std::cout << "One axis left, winners: " << multiplier/((double)winners.size()*VectorProduct(perm_levels)) << " " << emp::to_string(winners) << std::endl;
         for (PHEN_T & org : winners) {
-            fit_map[org]+=multiplier*dups[axes[0]]/((double)winners.size()*VectorProduct(perm_levels));
+            // Multiplier records number of different ways that we could have gotten to this point
+            // perm_levels represents the number of options we chose amongst every time we chose an axis
+            // and we also have to divide probability equally among remaining members of the population
+            fit_map[org]+=multiplier/((double)winners.size()*VectorProduct(perm_levels));
         }
         return;
     }
@@ -399,40 +428,65 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
     // There's only one thing in the population, so it wins
     if (pop.size() == 1) {
         // TODO: Figure out if we actually need this
-        // emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
-        // std::cout << "Winners: " << emp::to_string(winners) << std::endl;
-        for (PHEN_T & org : pop) {
+        // Multiplier records number of different ways that we could have gotten to this point
+        // perm_levels represents the number of options we chose amongst every time we chose an axis
+         for (PHEN_T & org : pop) {
             fit_map[org]+=multiplier/VectorProduct(perm_levels);
         }
         return;
     }
 
     PruneAxes(axes, pop, epsilon);
+    // std::cout << "Post pruning" << emp::to_string(axes) << std::endl;
     DeDuplicateAxes(axes, pop, dups);
 
-    int real_axes = 0;
-    for (int ax : axes){
-        real_axes += dups[ax];
-    }
+    // for (auto el : dups) {
+    //     std::cout << el.first << ": " << el.second << ", ";
+    // }
+    // std::cout << std::endl;  
 
+    // No important axes left, everything ties
     if (axes.size() == 0) {
+        // std::cout << "No axis post pruning winners: " << multiplier/((double)pop.size()*VectorProduct(perm_levels)) << " " << emp::to_string(pop) << " Multiplier: " << multiplier << " Real axes: " << real_axes << std::endl;
+        // Multiplier records number of different ways that we could have gotten to this point
+        // perm_levels represents the number of options we chose amongst every time we chose an axis
+        // and we also have to divide probability equally among remaining members of the population
+        //
+        // Important note: we ended up here without choosing any new axes this round of recursion.
+        // We just learned that none of the axes left actually matter. So we don't need to add anything new to perm_levels
+        // or multiplier
         for (PHEN_T & org : pop) {
             fit_map[org]+=multiplier/((double)pop.size()*VectorProduct(perm_levels));
         }        
         return;
     }
 
-    perm_levels.push_back(real_axes);
 
     // Check for only one axis again now that we've pruned the axes
     if (axes.size() == 1) {
         emp::vector<PHEN_T> winners = FindHighest(pop, axes[0], epsilon);
-        // std::cout << "Winners: " << emp::to_string(winners) << std::endl;
+        // std::cout << "One axis post pruning winners: " << multiplier/((double)winners.size()*VectorProduct(perm_levels)) << " " << emp::to_string(winners) << " Multiplier: " << multiplier << " Real axes: " << real_axes << std::endl;
+        // Multiplier records number of different ways that we could have gotten to this point
+        // perm_levels represents the number of options we chose amongst every time we chose an axis
+        // and we also have to divide probability equally among remaining members of the population
+        //
+        // Important note: we ended up here without choosing any new axes this round of recursion.
+        // We just learned that none of the axes left actually matter. So we don't need to add anything new to perm_levels
+        // or multiplier
         for (PHEN_T & org : winners) {
-            fit_map[org]+=multiplier*real_axes*dups[axes[0]]/((double)winners.size()*VectorProduct(perm_levels));
+            fit_map[org]+=multiplier/((double)winners.size()*VectorProduct(perm_levels));
         }
         return;
     }
+
+    int real_axes = 0;
+    for (int ax : axes){
+        real_axes += dups[ax];
+    }
+
+    // std::cout << "adding level: " << real_axes << " " << emp::to_string(axes) << std::endl;
+    perm_levels.push_back(real_axes);
+
 
     // std::cout << "post processing: " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << std::endl;
 

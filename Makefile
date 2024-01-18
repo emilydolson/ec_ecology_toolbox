@@ -3,7 +3,7 @@ PROJECT := evo_comp_ecology
 EMP_DIR := third-party/Empirical/include/emp
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/ -Ithird-party/discreture/include/Discreture
+CFLAGS_all := -Wall -std=c++20 -fPIC -Wno-unused-function -I$(EMP_DIR)/
 
 # Native compiler information
 CXX := clang++
