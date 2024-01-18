@@ -31,6 +31,9 @@ test-cag: tests/test_cag.cpp
 	$(CXX_nat) $(CFLAGS_nat_debug) tests/test_cag.cpp -o test-cag
 	time ./test-cag
 
+coverage: 
+	$(CXX_nat) -shared $(shell python3 -m pybind11 --includes)/ $(CFLAGS_all)  -DNDEBUG -fprofile-arcs -ftest-coverage --coveragesource/wrapper.cc -o lexicase$(shell python3-config --extension-suffix)
+
 
 profile: tests/test_interaction_networks.cc
 	$(CXX_nat) $(CFLAGS_nat_profile) tests/test_interaction_networks.cc -o test
