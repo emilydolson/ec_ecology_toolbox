@@ -116,6 +116,9 @@ TEST_CASE("PruneAxes", "[helpers]") {
 }
 
 TEST_CASE("Epsilon", "[selection_schemes]") {
+    emp::Random r;
+    r.ResetSeed(2);
+
     emp::vector<org_t> pop = emp::vector<org_t>({{0,0,0,0,0,0,0,0,0,1}, {0,0,0,0,1,0,0,0,0,1}, 
                                                  {0,0,0,0,0,0,0,0,0,0},
                                                  {0,0,0,0,2,0,0,0,0,1}, {0,0,0,0,1,0,0,0,1,1},
