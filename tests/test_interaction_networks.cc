@@ -141,18 +141,16 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
                               {-4,-4,-3,-4,-3,-4,-4,-4,-3,-3}});
 
     fits = LexicaseFitness(pop, 2.9);
-    fit_map_t unopt_fits;
+    fit_map_t unopt_fits = UnoptimizedLexicaseFitness(pop, 2.9);
+    // std::cout << emp::to_string(fits) << " " << emp::to_string(unopt_fits) << std::endl;
+    CHECK(fits.size() == unopt_fits.size());
     double total = 0;
-    // fit_map_t unopt_fits = UnoptimizedLexicaseFitness(pop, 2.9);
-    // // std::cout << emp::to_string(fits) << " " << emp::to_string(unopt_fits) << std::endl;
-    // CHECK(fits.size() == unopt_fits.size());
-    // double total = 0;
-    // for (size_t i = 0; i<fits.size(); i++) {
-    //     total += fits[i];
-    //     CHECK(fits[i] == Approx(unopt_fits[i]));
-    //     CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 2.9)));
-    // }
-    // CHECK(total == Approx(1));
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 2.9)));
+    }
+    CHECK(total == Approx(1));
 
     pop.clear();
     pop.resize(10);
