@@ -115,6 +115,126 @@ TEST_CASE("PruneAxes", "[helpers]") {
 
 }
 
+TEST_CASE("Epsilon", "[selection_schemes]") {
+    emp::Random r;
+    r.ResetSeed(2);
+
+    emp::vector<org_t> pop = emp::vector<org_t>({{0,0,0,0,0,0,0,0,0,1}, {0,0,0,0,1,0,0,0,0,1}, 
+                                                 {0,0,0,0,0,0,0,0,0,0},
+                                                 {0,0,0,0,2,0,0,0,0,1}, {0,0,0,0,1,0,0,0,1,1},
+                                                 {0,0,1,0,1,0,0,0,0,1}, {0,0,1,0,1,0,0,0,1,1}});
+    fit_map_t fits = LexicaseFitness(pop, 3);
+    CHECK(fits[0] == Approx(1.0/7.0));
+    CHECK(fits[1] == Approx(1.0/7.0));
+    CHECK(fits[2] == Approx(1.0/7.0));
+    CHECK(fits[3] == Approx(1.0/7.0));
+    CHECK(fits[4] == Approx(1.0/7.0));
+    CHECK(fits[5] == Approx(1.0/7.0));
+    CHECK(fits[6] == Approx(1.0/7.0));
+   
+    pop = emp::vector<org_t>({{-1,-1,-1,-1,-1,-1,-1,-1,-1, 1}, 
+                              {-2,-2,-2,-2, 0,-2,-2,-2,-2, 0}, 
+                              { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {-3,-3,-3,-3, 1,-3,-3,-3,-3,-1}, 
+                              {-3,-3,-3,-3,-2,-3,-3,-3,-2,-2},
+                              {-3,-3,-2,-3,-2,-3,-3,-3,-3,-2}, 
+                              {-4,-4,-3,-4,-3,-4,-4,-4,-3,-3}});
+
+    fits = LexicaseFitness(pop, 2.9);
+    fit_map_t unopt_fits = UnoptimizedLexicaseFitness(pop, 2.9);
+    // std::cout << emp::to_string(fits) << " " << emp::to_string(unopt_fits) << std::endl;
+    CHECK(fits.size() == unopt_fits.size());
+    double total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 2.9)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(10);
+
+    for (int org = 0; org < 10; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 10; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 3);
+    unopt_fits = UnoptimizedLexicaseFitness(pop, 3);
+    CHECK(fits.size() == unopt_fits.size());
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 3)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(10);
+
+    for (int org = 0; org < 10; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 10; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 2);
+    unopt_fits = UnoptimizedLexicaseFitness(pop, 2);
+    CHECK(fits.size() == unopt_fits.size());
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 2)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(10);
+
+    for (int org = 0; org < 10; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 10; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 1);
+    unopt_fits = UnoptimizedLexicaseFitness(pop, 1);
+    CHECK(fits.size() == unopt_fits.size());
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+        CHECK(fits[i] == Approx(unopt_fits[i]));
+        CHECK(fits[i] == Approx(LexicaseFitnessIndividual(pop, i, 1)));
+    }
+    CHECK(total == Approx(1));
+
+    pop.clear();
+    pop.resize(40);
+
+    for (int org = 0; org < 40; ++org) {
+        // pop[org].resize(10);
+        for (int loc = 0; loc < 40; ++loc) {
+            pop[org].push_back(r.GetGeometric(.5));
+        }
+    } 
+
+    fits = LexicaseFitness(pop, 3);
+    total = 0;
+    for (size_t i = 0; i<fits.size(); i++) {
+        total += fits[i];
+
+    }
+    CHECK(total == Approx(1));
+
+}
+
 
 TEST_CASE("Lexicase", "[selection_schemes]") {
     emp::vector<org_t> pop({{3,0,0}, {0, 3, 0}, {0,0,3}});

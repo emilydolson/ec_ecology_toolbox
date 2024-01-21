@@ -23,9 +23,9 @@ def test_lex_prob():
                           (7, 20, 3),                          
                           (8, 8, 20),                          
                           (9, 20, 8),                            
-                        #   (6, 20, 30),
-                        #   (7, 30, 30),
-                        #   (8, 40, 40)
+                          (6, 20, 30),
+                          (7, 30, 30),
+                          (8, 40, 40)
                           ])
 @pytest.mark.bench
 def test_benchmark_lex_prob(benchmark, seed, n, m):
