@@ -31,6 +31,10 @@ test-cag: tests/test_cag.cpp
 	$(CXX_nat) $(CFLAGS_nat_debug) tests/test_cag.cpp -o test-cag
 	time ./test-cag
 
+test-nsga: tests/test_nsga.cpp
+	$(CXX_nat) $(CFLAGS_nat_debug) tests/test_nsga.cpp -o test-nsga
+	./test-nsga
+
 coverage: 
 	$(CXX_nat) -shared $(shell python3 -m pybind11 --includes)/ $(CFLAGS_all)  -DNDEBUG -fprofile-arcs -ftest-coverage --coveragesource/wrapper.cc -o lexicase$(shell python3-config --extension-suffix)
 

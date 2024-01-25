@@ -17,6 +17,8 @@
 #include "datastructs/Graph.hpp"
 // #include "Evolve/Resource.hpp"
 
+#include "nsga_helpers.hpp"
+
 #include <math.h>  
 
 // from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
@@ -674,6 +676,15 @@ emp::vector<double> TournamentFitness(emp::vector<PHEN_T> & pop, int t_size = 2)
     TournamentHelper(fit_map, t_size);
     return fit_map;
 }
+
+template <typename PHEN_T>
+emp::vector<double> NSGAIIFitness(emp::vector<PHEN_T> & pop, int pop_size) {
+    emp_assert(pop.size() > 0);
+    emp::vector<double> fit_map(pop.size(), 0);
+    NSGAIIHelper(fit_map, pop, pop_size);
+    return fit_map;
+}
+
 
 template <typename PHEN_T>
 emp::vector<double> SharingFitness(emp::vector<PHEN_T> & pop, int t_size = 2, double alpha = 1, double sigma_share = 8.0) {

@@ -55,38 +55,30 @@ bool pareto_dominance(const PHEN_T &obj1, const PHEN_T &obj2)
 }
 
 template <typename PHEN_T>
-emp::vector<PHEN_T> crowding_distance(const emp::vector<PHEN_T> & non_dom_front)
+emp::vector<double> crowding_distance(emp::vector<size_t> & non_dom_front, const emp::vector<PHEN_T> & pop)
 {
-    size_t N = non_dom_front.size();
+    size_t N = pop.size();
     // We make sure to have two points at least
-    size_t M = non_dom_front[0].size();
+    size_t M = pop[0].size();
     // We make sure the first point of the input non dominated front contains at least two objectives
 
-    emp::vector<size_t> indexes(N);
-    std::iota(indexes.begin(), indexes.end(), 0);
-    emp::vector<double> dists(N, 0.);
+    // emp::vector<size_t> indexes(N);
+    // std::iota(indexes.begin(), indexes.end(), 0);
+    emp::vector<double> dists(N, -1);
     for (size_t i = 0; i < M; ++i) {
-        std::sort(indexes.begin(), indexes.end(), [i, &non_dom_front](size_t idx1, size_t idx2) {
-            return greater_than_f(non_dom_front[idx1][i], non_dom_front[idx2][i]);
+        std::sort(non_dom_front.begin(), non_dom_front.end(), [i, &pop](size_t idx1, size_t idx2) {
+            return greater_than_f(pop[idx1][i], pop[idx2][i]);
         });
-        dists[indexes[0]] = std::numeric_limits<double>::infinity();
-        dists[indexes[N - 1]] = std::numeric_limits<double>::infinity();
-        double df = non_dom_front[indexes[N - 1]][i] - non_dom_front[indexes[0]][i];
+        dists[non_dom_front[0]] = std::numeric_limits<double>::infinity();
+        dists[non_dom_front[N - 1]] = std::numeric_limits<double>::infinity();
+        double df = pop[non_dom_front[N - 1]][i] - pop[non_dom_front[0]][i];
         for (size_t j = 1; j < N - 1; ++j) {
-            dists[indexes[j]] += (non_dom_front[indexes[j + 1]][i] - non_dom_front[indexes[j - 1]][i]) / df;
+            dists[non_dom_front[j]] += (pop[non_dom_front[j + 1]][i] - pop[non_dom_front[j - 1]][i]) / df;
         }
     }
 
-    std::sort(indexes.begin(), indexes.end(), [&dists](size_t idx1, size_t idx2) {
-        return less_than_f(dists[idx1], dists[idx2]);
-    }); // Ascending order
+    return dists;
 
-    emp::vector<PHEN_T> result;
-    for (size_t i : indexes) {
-        result.push_back(non_dom_front[i]);
-    }
-
-    return result;
 }
 
 template <typename PHEN_T>
@@ -143,16 +135,43 @@ emp::vector<PHEN_T> NSGAIIHelper(emp::vector<double> & fit_map, const emp::vecto
     if (current_front.size() <= N) {
         for (size_t i : current_front) {
             result.push_back(pop[i]);
+            fit_map[i] = 1;
         }
     } else {
-        emp::vector<PHEN_T> front_phens;
-        for (size_t i : current_front) {
-            front_phens.push_back(pop[i]);
-        }
-        emp::vector<PHEN_T> sorted = crowding_distance(front_phens);
+        emp::vector<double> dists = crowding_distance(current_front, pop);
+        emp::vector<size_t> indexes(pop.size());
+        std::iota(indexes.begin(), indexes.end(), 0);
+        std::sort(indexes.begin(), indexes.end(), [&dists](size_t idx1, size_t idx2) {
+            return less_than_f(dists[idx1], dists[idx2]);
+        }); // Ascending order
+
+        int equal_count = 0;
+        emp::vector<size_t> equal_set;
         while (result.size() < N) {
-            result.push_back(sorted.back());
-            sorted.pop_back();
+            if (dists[indexes.back()] == dists[indexes[indexes.size() - 2]]) {
+                ++equal_count;
+                equal_set.push_back(indexes.back());
+            } else {
+                for (size_t i : equal_set) {
+                    fit_map[i] = 1.0;
+                }
+                fit_map[indexes.back()] = 1.0;
+                equal_count = 0;
+                equal_set.clear();
+            }
+            emp_assert(indexes.back() != -1);
+            result.push_back(pop[indexes.back()]);
+            indexes.pop_back();
+        }
+        if (equal_count > 0) {
+            while (dists[indexes.back()] == dists[indexes[indexes.size() - 2]]) {
+                equal_count++;
+                equal_set.push_back(indexes.back());
+                indexes.pop_back();
+            }
+            for (size_t i : equal_set) {
+                fit_map[i] = 1.0 / (equal_count);
+            }
         }
         return result;
     }
@@ -172,16 +191,44 @@ emp::vector<PHEN_T> NSGAIIHelper(emp::vector<double> & fit_map, const emp::vecto
         if (result.size() + current_front.size() <= N) {
             for (size_t i : current_front) {
                 result.push_back(pop[i]);
+                fit_map[i] = 1;
             }
         } else {
-            emp::vector<PHEN_T> front_phens;
-            for (size_t i : current_front) {
-                front_phens.push_back(pop[i]);
-            }
-            emp::vector<PHEN_T> sorted = crowding_distance(front_phens);
+            emp::vector<double> dists = crowding_distance(current_front, pop);
+            emp::vector<size_t> indexes(pop.size());
+            std::iota(indexes.begin(), indexes.end(), 0);
+            std::sort(indexes.begin(), indexes.end(), [&dists](size_t idx1, size_t idx2) {
+                return less_than_f(dists[idx1], dists[idx2]);
+            }); // Ascending order
+
+            int equal_count = 0;
+            emp::vector<size_t> equal_set;
             while (result.size() < N) {
-                result.push_back(sorted.back());
-                sorted.pop_back();
+                if (dists[indexes.back()] == dists[indexes[indexes.size() - 2]]) {
+                    ++equal_count;
+                    equal_set.push_back(indexes.back());
+                } else {
+                    for (size_t i : equal_set) {
+                        fit_map[i] = 1.0;
+                    }
+                    fit_map[indexes.back()] = 1.0;
+                    equal_count = 0;
+                    equal_set.clear();
+                }
+
+                emp_assert(indexes.back() != -1);
+                result.push_back(pop[indexes.back()]);
+                indexes.pop_back();
+            }
+            if (equal_count > 0) {
+                while (dists[indexes.back()] == dists[indexes[indexes.size() - 2]]) {
+                    equal_count++;
+                    equal_set.push_back(indexes.back());
+                    indexes.pop_back();
+                }
+                for (size_t i : equal_set) {
+                    fit_map[i] = 1.0 / (equal_count);
+                }
             }
         } 
 

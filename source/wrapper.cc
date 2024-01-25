@@ -155,6 +155,25 @@ PYBIND11_MODULE(selection_probabilities, m) {
             )mydelimiter",
           py::arg("pop"), py::arg("t_size") = 2);
 
+    m.def("NSGAIIFitness", &NSGAIIFitness<emp::vector<double>>, 
+            R"mydelimiter(
+            Return a vector containing the probability that each member of the population will be selected under NSGAII.
+
+            The numbers in the pop parameter are assumed to be scores on a set of test cases/fitness criteria/tasks.
+            Overall "Fitness" will be calculated as the sum of these scores.
+
+            Parameters
+            ----------
+            pop: list of lists of floats 
+              The scores of each member of the population population on each test case/fitness criterion.
+
+            Returns
+            -------
+            List of floats
+              The probabilities of each individual in pop being selected.            
+            )mydelimiter",
+          py::arg("pop"), py::arg("pop_size"));
+
     py::class_<emp::Random>(m, "Random")
       .def(py::init<int>());
 
