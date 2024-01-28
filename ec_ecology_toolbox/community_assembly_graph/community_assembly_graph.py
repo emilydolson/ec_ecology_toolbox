@@ -248,19 +248,19 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
     return explored_graph
 
 
-if __name__ == '__main__':
-    import time
-    from ec_ecology_toolbox.community_assembly_graph.custom_user_functions import custom_user_func_4
-    from ec_ecology_toolbox.community_assembly_graph.benchmarking.benchmarking import benchmarking_func2
-    from ec_ecology_toolbox.community_assembly_graph.example_nodes import Chr_Node, Set_Node
-
-    start_time = time.time()
-    N = Chr_Node(1)
-    graph = CAG(N, custom_user_func_4, 10, False, 25000)
-    end_time = time.time()
-
-    print(graph)
-    print("Run Time:", end_time - start_time)
+# if __name__ == '__main__':
+#     import time
+#     from ec_ecology_toolbox.community_assembly_graph.custom_user_functions import custom_user_func_4
+#     from ec_ecology_toolbox.community_assembly_graph.benchmarking.benchmarking import benchmarking_func2
+#     from ec_ecology_toolbox.community_assembly_graph.example_nodes import Chr_Node, Set_Node
+#
+#     start_time = time.time()
+#     N = Chr_Node(1)
+#     graph = CAG(N, custom_user_func_4, 10, False, 25000)
+#     end_time = time.time()
+#
+#     print(graph)
+#     print("Run Time:", end_time - start_time)
 
     # random.seed(48)
     # start_time = time.time()
