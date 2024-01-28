@@ -11,7 +11,7 @@ class Set_Node:
     def __init__(self, *args):
         self.members = set()
         if len(args) == 1:
-            self.members = args[0]
+            self.members = set(args[0])
 
     def __repr__(self):
         return str(self.members)

@@ -4,10 +4,11 @@ __author__ = """Emily Dolson"""
 __email__ = 'emilydolson@gmail.com'
 __version__ = '0.0.8'
 
-from ec_ecology_toolbox import selection_probabilities
-from .community_assembly_graph import community_assembly_graph
+# from ec_ecology_toolbox import selection_probabilities
+from .community_assembly_graph import community_assembly_graph, example_nodes
 
 __all__ = [
-    "selection_probabilities",
-    "community_assembly_graph"
+    # "selection_probabilities",
+    "community_assembly_graph",
+    "example_nodes"
 ]

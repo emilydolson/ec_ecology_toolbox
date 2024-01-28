@@ -2,6 +2,8 @@ from copy import deepcopy
 from queue import PriorityQueue
 from numpy import dot
 from numpy.linalg import matrix_power
+# import FibonacciHeap
+# import random
 
 
 def random_walk_matrix_multiplication(graph, start_node, num_iterations):
@@ -71,6 +73,8 @@ def update_priorities(graph, leaves, start_node, node_passing_p, num_iterations)
     # New priority queue to hold nodes with updated priorities
     new_pq = PriorityQueue()
 
+    # new_f_heap = FibonacciHeap.FibonacciHeap()
+
     for curr_node in leaves:
         # Creates sink nodes with self edges for all leaf nodes
         graph[curr_node] = {curr_node: 1.0}
@@ -86,9 +90,11 @@ def update_priorities(graph, leaves, start_node, node_passing_p, num_iterations)
         new_p = pr[idx[curr_node]]
 
         new_pq.put(tuple([-1*new_p, curr_node]))
+        # new_f_heap.insert_node(tuple([-1*new_p, curr_node]))
         node_passing_p[curr_node] = new_p
 
     return new_pq
+    # return new_f_heap
 
 
 def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_iterations=1500):
@@ -115,6 +121,8 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
     # priority queue that holds the discovered nodes based on the probability of reaching it
     p_queue = PriorityQueue()
 
+    # f_heap = FibonacciHeap()
+
     # set contains all nodes that have been visited and explored
     visited = set()
 
@@ -137,6 +145,7 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
     # initializing the exploration with the start node
     # queue is min_heap so passing probability negated
     p_queue.put(tuple([-1, start_node]))
+    # f_heap.insert_node(tuple([-1, start_node]))
     discovered.add(start_node)
     active_pq_nodes.add(start_node)
     node_passing_p = {start_node: 1}
@@ -147,12 +156,16 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
             # graph completely explored. No new nodes to explore
             break
 
+        # if f_heap.count <= 0:
+        #     break
+
         if discovered == visited:
             # graph completely explored. No new nodes to explore
             break
 
         # Retrieving node of the highest priority i.e. most likely node to reach next
         curr_p, curr_node = p_queue.get()
+        # curr_p, curr_node = f_heap.extract_min()
 
         if curr_node not in active_pq_nodes:
             # optimization
@@ -172,6 +185,7 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
 
             curr_leaves = discovered - visited
             p_queue = update_priorities(explored_graph, curr_leaves, start_node, node_passing_p, num_iterations)
+            # f_heap = update_priorities(explored_graph, curr_leaves, start_node, node_passing_p, num_iterations)
 
             # active nodes in the new queue are only the leaf nodes
             active_pq_nodes = curr_leaves
@@ -219,6 +233,7 @@ def CAG(start_node, user_func, num_nodes=10, normalize_w_self_edges=False, num_i
             # Adding the adjacent node into the priority queue
             new_p = node_passing_p[adjacent_node]
             p_queue.put(tuple([-1*new_p, adjacent_node]))
+            # f_heap.insert_node(tuple([-1*new_p, adjacent_node]))
 
             # updating the discovery of the adjacent node
             discovered.add(adjacent_node)
@@ -237,7 +252,7 @@ if __name__ == '__main__':
     import time
     from ec_ecology_toolbox.community_assembly_graph.custom_user_functions import custom_user_func_4
     from ec_ecology_toolbox.community_assembly_graph.benchmarking.benchmarking import benchmarking_func2
-    from ec_ecology_toolbox.community_assembly_graph.example_nodes import Chr_Node
+    from ec_ecology_toolbox.community_assembly_graph.example_nodes import Chr_Node, Set_Node
 
     start_time = time.time()
     N = Chr_Node(1)
@@ -247,13 +262,20 @@ if __name__ == '__main__':
     print(graph)
     print("Run Time:", end_time - start_time)
 
+    # random.seed(48)
     # start_time = time.time()
     # N = Chr_Node(1)
-    # graph = CAG(N, benchmarking_func2, 5, False, 250)
+    # graph = CAG(N, benchmarking_func2, 1000, False, 500)
     # end_time = time.time()
     #
     # print(graph)
     # print("Run Time:", end_time - start_time)
+    # on Average ~190 seconds with PQueue
+    # on Average ~170 seconds with F_heap
+
+
+
+
 
 
 

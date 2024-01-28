@@ -11,10 +11,13 @@ def benchmarking_func1(n):
 
 
 def benchmarking_func2(n):
+    # random.seed(5)
     random_int = random.randint(0, 15)
     edges = {}
     for i in range(random_int):
         node = random.randint(1, 2500)
+        if node == n.val:
+            continue
         weight = round(random.random(), 2)
         edges[Chr_Node(node)] = weight
     return edges
