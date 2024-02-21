@@ -15,10 +15,12 @@ __version__ = "0.0.8"
 #   reproducible builds (https://github.com/pybind/python_example/pull/53)
 
 ext_modules = [
-    Pybind11Extension("ec_ecology_toolbox",
+    Pybind11Extension("ec_ecology_toolbox.selection_probabilities",
                       ["source/wrapper.cc"],
                       include_dirs=['third-party/Empirical/include/emp'],
-                      cxx_std=20
+                      cxx_std=20  # ,
+                    #   define_macros=[('_DEBUG', 1), ('DEBUG', 1), ('NDEBUG', 0)],
+                    #   extra_compile_args=["-g", "-O0"]
                       ),
 ]
 
@@ -31,6 +33,8 @@ setup(
     description="Tools to analyze the ecology of evolutionary algorithms",
     long_description="Tools to analyze the ecology of evolutionary algorithms",
     ext_modules=ext_modules,
+    packages=['ec_ecology_toolbox', 'ec_ecology_toolbox.community_assembly_graph'],
+
     extras_require={"test": "pytest"},
     # Currently, build_ext only provides an optional "highest supported C++
     # level" feature, but in the future it may provide more features.

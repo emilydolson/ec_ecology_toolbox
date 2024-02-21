@@ -1,12 +1,22 @@
 
 #include "interaction_networks.hpp"
-#include "Evolve/NK.hpp"
+// #include "Evolve/NK.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
-PYBIND11_MODULE(ec_ecology_toolbox, m) {
+PYBIND11_DECLARE_HOLDER_TYPE(T, emp::Ptr<T>, true);
+
+// Only needed if the type's `.get()` goes by another name
+namespace pybind11 { namespace detail {
+    template <typename T>
+    struct holder_helper<emp::Ptr<T>> { // <-- specialization
+        static const T *get(const emp::Ptr<T> &p) { return p.Raw(); }
+    };
+}}
+
+PYBIND11_MODULE(selection_probabilities, m) {
     m.doc() = "Tools for measuring the ecology of various evolutionary algorithms"; 
 
     m.def("LexicaseFitness", &LexicaseFitness<emp::vector<double>>, 
@@ -148,12 +158,12 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
     py::class_<emp::Random>(m, "Random")
       .def(py::init<int>());
 
-    py::class_<emp::BitVector>(m, "BitVector")
-      .def(py::init<std::string>());
+    // py::class_<emp::BitVector>(m, "BitVector")
+    //   .def(py::init<std::string>());
 
-    py::class_<emp::NKLandscape>(m, "NKLandscape")
-      .def(py::init<size_t, size_t, emp::Random&>())
-      .def("GetFitness", static_cast<double (emp::NKLandscape::*)(size_t, size_t) const>(&emp::NKLandscape::GetFitness))
-      .def("GetFitnesses", static_cast<emp::vector<double> (emp::NKLandscape::*)(emp::BitVector) const>(&emp::NKLandscape::GetFitnesses))
+    // py::class_<emp::NKLandscape>(m, "NKLandscape")
+    //   .def(py::init<size_t, size_t, emp::Random&>())
+    //   .def("GetFitness", static_cast<double (emp::NKLandscape::*)(size_t, size_t) const>(&emp::NKLandscape::GetFitness))
+    //   .def("GetFitnesses", static_cast<emp::vector<double> (emp::NKLandscape::*)(emp::BitVector) const>(&emp::NKLandscape::GetFitnesses))
       ;
 }

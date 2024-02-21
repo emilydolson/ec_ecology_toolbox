@@ -1,0 +1,4 @@
+pybind11
+pytest
+pytest-benchmark
+oldest-supported-numpy
