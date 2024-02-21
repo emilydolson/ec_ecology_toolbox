@@ -31,7 +31,7 @@ PYBIND11_MODULE(ec_ecology_toolbox, m) {
             List of floats
               The probabilities of each individual in pop being selected by lexicase selection.            
             )mydelimiter",
-          py::arg("pop"), py::arg("epsilon") = 0.0);//, py::arg("binary") = false);
+          py::arg("pop"), py::arg("epsilon") = 0.0, py::arg("epsilon_type") = 0);//, py::arg("binary") = false);
     
     m.def("UnoptimizedLexicaseFitness", &UnoptimizedLexicaseFitness<emp::vector<double>>, 
             R"mydelimiter(

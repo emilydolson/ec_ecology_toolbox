@@ -97,7 +97,7 @@ TEST_CASE("PruneAxes", "[helpers]") {
     emp::vector<org_t> v({{1,2,3}, {2, 1, 3}, {1,3,3}});
     emp::vector<int> axes({0,1,2});
     emp::vector<int> result(axes);
-    PruneAxes(result, v);
+    PruneAxes(result, v, {0,0,0});
 
     CHECK(result.size() == 2);
     CHECK(emp::Has(result, 0));
@@ -105,10 +105,10 @@ TEST_CASE("PruneAxes", "[helpers]") {
 
     emp::vector<emp::vector<double> > v2({{1.5,2.1,3.1}, {1.5, 1.1, 1.1}, {1.1,1.1,1.1}, {1.5,0,0}, {1.1,0,0}, {1.2,1,3.1}});
     result = axes;
-    PruneAxes(result, v2);
+    PruneAxes(result, v2, {0,0,0});
     CHECK(result.size() == 3);
     result = axes;
-    PruneAxes(result, v2, .4);
+    PruneAxes(result, v2, {.4, .4, .4});
     CHECK(result.size() == 2);
     CHECK(emp::Has(result, 1));
     CHECK(emp::Has(result, 2));
@@ -123,7 +123,7 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
                                                  {0,0,0,0,0,0,0,0,0,0},
                                                  {0,0,0,0,2,0,0,0,0,1}, {0,0,0,0,1,0,0,0,1,1},
                                                  {0,0,1,0,1,0,0,0,0,1}, {0,0,1,0,1,0,0,0,1,1}});
-    fit_map_t fits = LexicaseFitness(pop, 3);
+    fit_map_t fits = LexicaseFitness(pop, 3, 1);
     CHECK(fits[0] == Approx(1.0/7.0));
     CHECK(fits[1] == Approx(1.0/7.0));
     CHECK(fits[2] == Approx(1.0/7.0));
@@ -140,7 +140,7 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
                               {-3,-3,-2,-3,-2,-3,-3,-3,-3,-2}, 
                               {-4,-4,-3,-4,-3,-4,-4,-4,-3,-3}});
 
-    fits = LexicaseFitness(pop, 2.9);
+    fits = LexicaseFitness(pop, 2.9, 1);
     fit_map_t unopt_fits = UnoptimizedLexicaseFitness(pop, 2.9);
     // std::cout << emp::to_string(fits) << " " << emp::to_string(unopt_fits) << std::endl;
     CHECK(fits.size() == unopt_fits.size());
@@ -162,7 +162,7 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
         }
     } 
 
-    fits = LexicaseFitness(pop, 3);
+    fits = LexicaseFitness(pop, 3, 1);
     unopt_fits = UnoptimizedLexicaseFitness(pop, 3);
     CHECK(fits.size() == unopt_fits.size());
     total = 0;
@@ -183,7 +183,7 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
         }
     } 
 
-    fits = LexicaseFitness(pop, 2);
+    fits = LexicaseFitness(pop, 2, 1);
     unopt_fits = UnoptimizedLexicaseFitness(pop, 2);
     CHECK(fits.size() == unopt_fits.size());
     total = 0;
@@ -204,7 +204,7 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
         }
     } 
 
-    fits = LexicaseFitness(pop, 1);
+    fits = LexicaseFitness(pop, 1, 1);
     unopt_fits = UnoptimizedLexicaseFitness(pop, 1);
     CHECK(fits.size() == unopt_fits.size());
     total = 0;
@@ -225,7 +225,7 @@ TEST_CASE("Epsilon", "[selection_schemes]") {
         }
     } 
 
-    fits = LexicaseFitness(pop, 3);
+    fits = LexicaseFitness(pop, 3, 1);
     total = 0;
     for (size_t i = 0; i<fits.size(); i++) {
         total += fits[i];
@@ -455,7 +455,7 @@ TEST_CASE("Lexicase", "[selection_schemes]") {
     CHECK(fits_d[1] == Approx(.333333));
     CHECK(fits_d[2] == Approx(.16666667));
 
-    fits_d = LexicaseFitness(pop_d, 1.01);
+    fits_d = LexicaseFitness(pop_d, 1.01, 1);
     CHECK(fits_d[0] == Approx(0));
     CHECK(fits_d[0] == Approx(LexicaseFitnessIndividual(pop, 0, 1.01)));
     CHECK(fits_d[1] == Approx(.25));
@@ -865,7 +865,7 @@ TEST_CASE("Test epsilon lexicase") {
                             {0, 0, 0, 0, 0}, 
                             {0, 0, 0, 0, 1}, 
                             {0, 0, 0, 1, 0}});
-    fit_map_t fits = LexicaseFitness(pop, 2);
+    fit_map_t fits = LexicaseFitness(pop, 2, 1);
     for (auto & o : fits) {
         CHECK(o == Approx(.25));
     }
