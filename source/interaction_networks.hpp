@@ -14,10 +14,21 @@
 #include "datastructs/set_utils.hpp"
 #include "math/math.hpp"
 #include "math/distances.hpp"
+#include "math/stats.hpp"
 #include "datastructs/Graph.hpp"
 // #include "Evolve/Resource.hpp"
 
 #include <math.h>  
+
+double MedianAbsoluteDeviation(const emp::vector<double> & v) {
+    double median = emp::Median(v);
+    emp::vector<double> deviations;
+    for (double val : v) {
+        deviations.push_back(std::abs(val - median));
+    }
+    return emp::Median(deviations);
+}
+
 
 // from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
 template<class T, class U>
@@ -412,7 +423,7 @@ double TraverseDecisionTreeIndividual(emp::vector<PHEN_T> & pop, emp::vector<int
 *
 */
 template <typename PHEN_T>
-void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, std::map<int,int> dups, emp::vector<double> epsilons, int epsilon_type, double multiplier = 1.0) {
+void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T> & pop, emp::vector<int> axes, emp::vector<int> perm_levels, std::map<int,int> dups, emp::vector<double> epsilons, int epsilon_type, std::function<double(emp::vector<double>)> eps_function = MedianAbsoluteDeviation, double multiplier = 1.0) {
     // std::cout << std::endl << std::endl << "begining round of recursion " << axes.size() << emp::to_string(pop) << emp::to_string(axes) << " " << multiplier << " " << emp::to_string(perm_levels) << std::endl;
 
 
@@ -529,7 +540,7 @@ void TraverseDecisionTree(std::map<PHEN_T, double> & fit_map, emp::vector<PHEN_T
         // } else if (winners.size() < 100 && next_axes.size() > 2) { // optimization
         //     HandleThreeOrgs(fit_map, winners, next_axes, perm_levels, epsilon);
         } else { // tie
-            TraverseDecisionTree(fit_map, winners, next_axes, perm_levels, dups, new_epsilons, epsilon_type, new_multiplier);
+            TraverseDecisionTree(fit_map, winners, next_axes, perm_levels, dups, new_epsilons, epsilon_type, eps_function, new_multiplier);
         }
     }
 }
@@ -569,16 +580,6 @@ void TraverseDecisionTreeNaive(std::map<PHEN_T, double> & fit_map, emp::vector<P
     }
 }
 
-
-
-double MedianAbsoluteDeviation(const emp::vector<double> & v) {
-    double median = emp::Median(v);
-    emp::vector<double> deviations;
-    for (double val : v) {
-        deviations.push_back(std::abs(val - median));
-    }
-    return emp::Median(deviations);
-}
 
 // epsilon_type indicates what type of epsilon lexicase to use. 0 = normal lexicase, 1 = semi-dynamic with constant epsilon, 2 = static with constant epsilon, 3 = semi-dynamic with automatic epsilon, 4 = dynamic with automatic epsilon, 5 = static with automatic epsilon
 template <typename PHEN_T>
@@ -631,7 +632,7 @@ emp::vector<double> LexicaseFitness(emp::vector<PHEN_T> & pop, double epsilon = 
     }
 
     emp::vector<PHEN_T> de_dup_pop = emp::RemoveDuplicates(pop);
-    TraverseDecisionTree(fit_map, de_dup_pop, emp::NRange(0, (int)n_funs), {}, dups, epsilons, epsilon_type);
+    TraverseDecisionTree(fit_map, de_dup_pop, emp::NRange(0, (int)n_funs), {}, dups, epsilons, epsilon_type, eps_function);
 
     for (PHEN_T & org : de_dup_pop) {
         fit_map[org] /= emp::Count(pop, org);
