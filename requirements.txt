@@ -8,6 +8,8 @@ exceptiongroup==1.2.0
     # via pytest
 iniconfig==2.0.0
     # via pytest
+numpy==1.19.3
+    # via oldest-supported-numpy
 oldest-supported-numpy==2023.10.25
     # via -r requirements.in
 packaging==23.2
@@ -18,7 +20,7 @@ py-cpuinfo==9.0.0
     # via pytest-benchmark
 pybind11==2.11.1
     # via -r requirements.in
-pytest==7.4.3
+pytest==8.0.2
     # via
     #   -r requirements.in
     #   pytest-benchmark
@@ -26,6 +28,3 @@ pytest-benchmark==4.0.0
     # via -r requirements.in
 tomli==2.0.1
     # via pytest
-
-# The following packages are considered to be unsafe in a requirements file:
-# numpy
