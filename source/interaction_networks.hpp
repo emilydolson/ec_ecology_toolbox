@@ -583,7 +583,7 @@ void TraverseDecisionTreeNaive(std::map<PHEN_T, double> & fit_map, emp::vector<P
 
 // epsilon_type indicates what type of epsilon lexicase to use. 0 = normal lexicase, 1 = semi-dynamic with constant epsilon, 2 = static with constant epsilon, 3 = semi-dynamic with automatic epsilon, 4 = dynamic with automatic epsilon, 5 = static with automatic epsilon
 template <typename PHEN_T>
-emp::vector<double> LexicaseFitness(emp::vector<PHEN_T> & pop, double epsilon = 0, int epsilon_type = 0, std::function<double(emp::vector<double>)> eps_function = MedianAbsoluteDeviation) {
+emp::vector<double> LexicaseFitness(emp::vector<PHEN_T> & pop, double epsilon = 0, int epsilon_type = 0, std::function<double(const emp::vector<double> &)> eps_function = MedianAbsoluteDeviation) {
 
     if (pop.size() == 0) {
         return emp::vector<double>();
