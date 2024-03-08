@@ -4,6 +4,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 namespace py = pybind11;
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, emp::Ptr<T>, true);
@@ -18,6 +19,8 @@ namespace pybind11 { namespace detail {
 
 PYBIND11_MODULE(selection_probabilities, m) {
     m.doc() = "Tools for measuring the ecology of various evolutionary algorithms"; 
+
+    m.def("MedianAbsoluteDeviation", &MedianAbsoluteDeviation, "Calculate the median absolute deviation of a list of numbers.");
 
     m.def("LexicaseFitness", &LexicaseFitness<emp::vector<double>>, 
             R"mydelimiter(
@@ -41,7 +44,7 @@ PYBIND11_MODULE(selection_probabilities, m) {
             List of floats
               The probabilities of each individual in pop being selected by lexicase selection.            
             )mydelimiter",
-          py::arg("pop"), py::arg("epsilon") = 0.0);//, py::arg("binary") = false);
+          py::arg("pop"), py::arg("epsilon") = 0.0, py::arg("epsilon_type") = 0, py::arg("eps_function") = py::cpp_function([](const emp::vector<double> & v){return MedianAbsoluteDeviation(v);}, py::arg("vec")));//, py::arg("binary") = false);
     
     m.def("UnoptimizedLexicaseFitness", &UnoptimizedLexicaseFitness<emp::vector<double>>, 
             R"mydelimiter(
